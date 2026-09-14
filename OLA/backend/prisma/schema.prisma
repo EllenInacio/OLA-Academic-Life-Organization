@@ -1,0 +1,49 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TipoEvento {
+  PROVA
+  TRABALHO
+  ENTREGA
+}
+
+enum StatusEvento {
+  PENDENTE
+  EM_ANDAMENTO
+  CONCLUIDO
+}
+
+model Disciplina {
+  id        Int      @id @default(autoincrement())
+  nome      String   @unique @db.VarChar(120)
+  professor String?  @db.VarChar(120)
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  eventos Evento[]
+
+  @@map("disciplina")
+}
+
+model Evento {
+  id           Int          @id @default(autoincrement())
+  titulo       String       @db.VarChar(150)
+  tipo         TipoEvento
+  data         DateTime     @db.Date
+  peso         Decimal      @db.Decimal(5, 2)
+  status       StatusEvento @default(PENDENTE)
+  disciplinaId Int          @map("disciplina_id")
+  criadoEm     DateTime     @default(now()) @map("criado_em")
+  atualizadoEm DateTime     @updatedAt @map("atualizado_em")
+
+  disciplina Disciplina @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+
+  @@index([data])
+  @@map("evento")
+}
