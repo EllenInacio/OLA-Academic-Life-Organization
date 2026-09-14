@@ -1,5 +1,13 @@
-# OLA-Academic-Life-Organization
-Plataforma web para organização da vida acadêmica, desenvolvida para auxiliar estudantes universitários no gerenciamento de disciplinas, atividades, prazos, notas, frequência e desempenho acadêmico.
+# OLA — Organização da Vida Acadêmica
+
+Plataforma web para estudantes universitários organizarem sua rotina acadêmica.
+Projeto Final de Curso - Bacharelado em Engenharia de Software, Universidade de
+Mogi das Cruzes (UMC).
+
+Esta entrega implementa a primeira funcionalidade: **calendário de provas e
+trabalhos**, com cadastro, edição, exclusão e visualização de eventos acadêmicos
+vinculados a disciplinas.
+
 ## Tecnologias
 
 | Camada | Tecnologia |
