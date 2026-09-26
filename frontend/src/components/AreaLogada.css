@@ -1,0 +1,51 @@
+.cabecalho-logado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.cabecalho-marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 14px;
+}
+
+.menu-link {
+  color: var(--cinza);
+  text-decoration: none;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+
+.menu-link:hover {
+  color: var(--lilas-escuro);
+}
+
+.menu-link.active {
+  color: var(--lilas-escuro);
+  font-weight: 600;
+  border-bottom-color: var(--lilas);
+}
+
+.menu-link:focus-visible,
+.menu .botao-secundario:focus-visible {
+  outline: 2px solid var(--lilas);
+  outline-offset: 2px;
+}
+
+.menu-usuario {
+  color: var(--preto);
+  font-weight: 600;
+  padding-left: 16px;
+  border-left: 1px solid var(--borda);
+}

@@ -1,0 +1,87 @@
+.privacidade-introducao {
+  font-size: 14px;
+  color: var(--cinza);
+  margin-bottom: 20px;
+}
+
+.privacidade-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.privacidade-dados {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  font-size: 13px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--borda);
+}
+
+.privacidade-dados dd {
+  overflow-wrap: anywhere;
+}
+
+.privacidade-dados dt {
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.privacidade-aviso {
+  font-size: 13px;
+  color: var(--cinza);
+  margin: 12px 0 8px;
+}
+
+.privacidade-aviso:first-of-type {
+  margin-top: 0;
+}
+
+.privacidade-tabela {
+  overflow-x: auto;
+  margin-top: 14px;
+}
+
+.privacidade-tabela table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.privacidade-tabela th,
+.privacidade-tabela td {
+  text-align: left;
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--borda);
+  vertical-align: top;
+}
+
+.privacidade-tabela th {
+  color: var(--lilas-escuro);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.privacidade-tabela td:nth-child(2) {
+  white-space: nowrap;
+}
+
+.privacidade-termos summary {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--lilas-escuro);
+  cursor: pointer;
+}
+
+.privacidade-termos .termos {
+  margin-top: 14px;
+}
+
+.privacidade-acoes button:focus-visible,
+.cartao > button:focus-visible,
+.privacidade-termos summary:focus-visible {
+  outline: 2px solid var(--lilas);
+  outline-offset: 2px;
+}
