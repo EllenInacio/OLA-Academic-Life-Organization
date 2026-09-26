@@ -1,0 +1,90 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TipoEvento {
+  PROVA
+  TRABALHO
+  ENTREGA
+}
+
+enum StatusEvento {
+  PENDENTE
+  EM_ANDAMENTO
+  CONCLUIDO
+}
+
+model Usuario {
+  id                        Int       @id @default(autoincrement())
+  nome                      String    @db.VarChar(120)
+  email                     String    @unique @db.VarChar(160)
+  senhaHash                 String    @map("senha_hash")
+  segredo2fa                String    @map("segredo_2fa")
+  versaoToken               Int       @default(0) @map("versao_token")
+  codigo2faHash             String?   @map("codigo_2fa_hash")
+  codigo2faExpiraEm         DateTime? @map("codigo_2fa_expira_em")
+  codigoRecuperacaoHash     String?   @map("codigo_recuperacao_hash")
+  codigoRecuperacaoExpiraEm DateTime? @map("codigo_recuperacao_expira_em")
+  consentimentoEm           DateTime  @map("consentimento_em")
+  consentimentoVersao       String    @map("consentimento_versao") @db.VarChar(10)
+  consentimentoRevogadoEm   DateTime? @map("consentimento_revogado_em")
+  criadoEm                  DateTime  @default(now()) @map("criado_em")
+
+  disciplinas Disciplina[]
+  logs        LogAuditoria[]
+
+  @@map("usuario")
+}
+
+model Disciplina {
+  id        Int      @id @default(autoincrement())
+  nome      String   @db.VarChar(120)
+  professor String?  @db.VarChar(120)
+  usuarioId Int      @map("usuario_id")
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  usuario Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  eventos Evento[]
+
+  @@unique([usuarioId, nome])
+  @@map("disciplina")
+}
+
+model Evento {
+  id           Int          @id @default(autoincrement())
+  titulo       String       @db.VarChar(150)
+  tipo         TipoEvento
+  data         DateTime     @db.Date
+  peso         Decimal      @db.Decimal(5, 2)
+  status       StatusEvento @default(PENDENTE)
+  disciplinaId Int          @map("disciplina_id")
+  criadoEm     DateTime     @default(now()) @map("criado_em")
+  atualizadoEm DateTime     @updatedAt @map("atualizado_em")
+
+  disciplina Disciplina @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+
+  @@index([data])
+  @@map("evento")
+}
+
+model LogAuditoria {
+  id         Int      @id @default(autoincrement())
+  acao       String   @db.VarChar(40)
+  entidade   String?  @db.VarChar(40)
+  entidadeId Int?     @map("entidade_id")
+  detalhe    String?  @db.VarChar(255)
+  ip         String?  @db.VarChar(45)
+  usuarioId  Int?     @map("usuario_id")
+  criadoEm   DateTime @default(now()) @map("criado_em")
+
+  usuario Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@index([usuarioId])
+  @@map("log_auditoria")
+}
