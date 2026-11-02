@@ -1,0 +1,187 @@
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.painel-colunas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.painel-bloco {
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.painel-titulo {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--preto);
+}
+
+.painel-nota {
+  font-size: 13px;
+  color: var(--cinza);
+  margin: 2px 0 16px;
+}
+
+.painel-nota a,
+.painel-link {
+  color: var(--lilas-escuro);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.painel-nota a:hover,
+.painel-link:hover {
+  text-decoration: underline;
+}
+
+.painel-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.proximos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+/* Pontos de atenção */
+.alertas {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.alerta {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  border-left: 4px solid #d9a441;
+  background: #fffbf3;
+}
+
+.alerta-alto {
+  border-left-color: var(--erro);
+  background: #fff7f6;
+}
+
+.alerta-selo {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fff3df;
+  color: #8a5a08;
+  white-space: nowrap;
+}
+
+.alerta-alto .alerta-selo {
+  background: var(--erro-fundo);
+  color: var(--erro);
+}
+
+.alerta-texto strong {
+  font-weight: 600;
+}
+
+/* Gráfico: andamento por disciplina */
+.grafico-legenda {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 12px;
+  color: var(--cinza);
+  margin-bottom: 14px;
+}
+
+.grafico-legenda li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.grafico-amostra {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.grafico-linhas {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.grafico-rotulo {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.grafico-nome {
+  color: var(--preto);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grafico-valor {
+  color: var(--cinza);
+  white-space: nowrap;
+}
+
+.grafico-trilho {
+  display: flex;
+  gap: 2px;
+  height: 12px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f1eff5;
+}
+
+.grafico-segmento {
+  min-width: 4px;
+  flex-basis: 0;
+}
+
+.segmento-concluido {
+  background: var(--lilas-escuro);
+}
+
+.segmento-andamento {
+  background: #a48be6;
+}
+
+.segmento-pendente {
+  background: #d6d2df;
+}
+
+@media (max-width: 960px) {
+  .painel-colunas {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

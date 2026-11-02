@@ -1,0 +1,14 @@
+:root {
+  --lilas: #7c5cd6;
+  --lilas-escuro: #5b3fb0;
+  --lilas-claro: #f2edfc;
+  --preto: #17161a;
+  --branco: #ffffff;
+  --cinza: #6d6a75;
+  --borda: #e5e1ee;
+  --erro: #b3261e;
+  --erro-fundo: #fdecea;
+  --sucesso: #1b7a52;
+  --sucesso-fundo: #e6f4ee;
+  --raio: 10px;
+}

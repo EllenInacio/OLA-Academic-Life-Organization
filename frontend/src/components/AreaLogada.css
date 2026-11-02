@@ -1,0 +1,229 @@
+/* Layout da área logada: menu lateral (protótipo do Figma) + conteúdo. */
+.layout {
+  --tinta: #47376c;
+  --fundo-lateral: #f8f6fd;
+  --fundo-cabecalho: #f4f3f7;
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--fundo-lateral);
+}
+
+.lateral {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--fundo-lateral);
+  padding: 28px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.lateral-marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+}
+
+.lateral-nome {
+  display: block;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: var(--tinta);
+}
+
+.lateral-slogan {
+  display: block;
+  font-size: 11px;
+  color: var(--cinza);
+  margin-top: 4px;
+}
+
+.lateral-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lateral-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--cinza);
+  font-family: inherit;
+  font-size: 15px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.lateral-link svg {
+  flex-shrink: 0;
+}
+
+.lateral-link:hover {
+  background: var(--lilas-claro);
+  color: var(--lilas-escuro);
+}
+
+.lateral-link.active {
+  background: var(--branco);
+  color: var(--lilas-escuro);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--lilas), 0 1px 2px rgba(23, 22, 26, 0.06);
+}
+
+.lateral-link:focus-visible {
+  outline: 2px solid var(--lilas);
+  outline-offset: 2px;
+}
+
+.lateral-rodape {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lateral-link-secundario,
+.lateral-sair {
+  font-size: 14px;
+}
+
+.lateral-usuario {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--preto);
+  padding: 8px 12px 4px;
+  overflow-wrap: anywhere;
+}
+
+.layout-conteudo {
+  min-width: 0;
+  min-height: 100vh;
+  background: #fcfbfe;
+  border-left: 1px solid var(--borda);
+}
+
+/* Cabeçalho e corpo de cada página (componente Pagina). */
+.pagina-cabecalho {
+  background: var(--fundo-cabecalho);
+  border-bottom: 1px solid var(--borda);
+  padding: 20px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.pagina-cabecalho h1 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--preto);
+}
+
+.pagina-cabecalho p {
+  font-size: 15px;
+  color: var(--cinza);
+}
+
+.pagina-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pagina-corpo {
+  padding: 28px 36px 48px;
+  max-width: 1200px;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .lateral {
+    position: static;
+    height: auto;
+    padding: 12px 16px;
+    gap: 10px;
+    border-right: none;
+    border-bottom: 1px solid var(--borda);
+  }
+
+  .lateral-slogan {
+    display: none;
+  }
+
+  .lateral-menu,
+  .lateral-rodape {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+
+  .layout-conteudo {
+    min-height: 0;
+    border-left: none;
+  }
+
+  .lateral-rodape {
+    margin-top: 0;
+    padding-top: 8px;
+    align-items: center;
+  }
+
+  .lateral-link {
+    width: auto;
+    white-space: nowrap;
+    padding: 8px;
+    font-size: 14px;
+    gap: 6px;
+  }
+
+  .lateral-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .lateral-link.active {
+    box-shadow: inset 0 -2px 0 var(--lilas);
+  }
+
+  .lateral-usuario {
+    order: -1;
+    flex-basis: 100%;
+    padding: 0 8px;
+  }
+
+  .pagina-cabecalho {
+    padding: 16px;
+  }
+
+  .pagina-cabecalho h1 {
+    font-size: 20px;
+  }
+
+  .pagina-cabecalho p {
+    font-size: 14px;
+  }
+
+  .pagina-corpo {
+    padding: 20px 16px 40px;
+  }
+}
