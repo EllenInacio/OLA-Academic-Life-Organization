@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+
+# Segredos: nunca versionar
+.env
+.env.test
+.env.local
+
+# Cliente gerado pelo Prisma (npx prisma generate)
+backend/src/generated/
