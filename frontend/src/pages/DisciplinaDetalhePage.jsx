@@ -10,6 +10,7 @@ import { excluirDisciplinaComConfirmacao } from "../utils/excluirDisciplina";
 import Selo from "../components/Selo";
 import { BarraFrequencia } from "../components/FrequenciaCard";
 import { SITUACAO_FREQUENCIA, SITUACAO_NOTA, rotuloRegra } from "../constants/desempenho";
+import { textoPeriodo } from "../utils/aulasDaSemana";
 import { formatarData, formatarNumero, formatarPercentual, plural, textoPrazo } from "../utils/formatacao";
 import "./DashboardPage.css";
 import "./DisciplinasPage.css";
@@ -19,6 +20,7 @@ function subtitulo(disciplina) {
     disciplina.professor,
     disciplina.semestre && `Semestre ${disciplina.semestre}`,
     disciplina.horario,
+    textoPeriodo(disciplina),
     disciplina.cargaHoraria && `${disciplina.cargaHoraria}h`,
   ].filter(Boolean);
 

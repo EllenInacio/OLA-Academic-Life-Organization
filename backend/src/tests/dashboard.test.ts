@@ -116,6 +116,27 @@ describe("Dashboard", () => {
     expect(depois.body.alertas).toEqual([]);
   });
 
+  it("devolve horário e período das aulas de cada disciplina para o calendário geral", async () => {
+    await criarDisciplina("Cálculo I", {
+      horario: "Seg 19:00–22:00",
+      inicioAulas: "2026-08-03",
+      fimAulas: "2026-12-12",
+    });
+    await criarDisciplina("Redes");
+
+    const resposta = await request(app).get("/api/dashboard").set(autorizacao);
+
+    const porNome = Object.fromEntries(
+      resposta.body.disciplinas.map((d: { nome: string }) => [d.nome, d])
+    );
+    expect(porNome["Cálculo I"]).toMatchObject({
+      horario: "Seg 19:00–22:00",
+      inicioAulas: "2026-08-03",
+      fimAulas: "2026-12-12",
+    });
+    expect(porNome["Redes"]).toMatchObject({ horario: null, inicioAulas: null, fimAulas: null });
+  });
+
   it("mostra somente os dados do usuário autenticado", async () => {
     const bia = await criarUsuarioDeTeste("bia@example.com");
     const disciplinaBia = await criarDisciplina("Física", {}, bia.autorizacao);

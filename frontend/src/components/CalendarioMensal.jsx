@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { aulaValeNaData } from "../utils/aulasDaSemana";
 import "./CalendarioMensal.css";
 
 const NOMES_MES = [
@@ -78,7 +79,6 @@ function gerarCelulas(mesVisivel) {
   return celulas;
 }
 
-
 export default function CalendarioMensal({ eventos = [], aulas = {} }) {
   const hoje = new Date();
   const temAulas = Object.keys(aulas).length > 0;
@@ -155,7 +155,7 @@ export default function CalendarioMensal({ eventos = [], aulas = {} }) {
         {celulas.map(({ data, doMesAtual }) => {
           const chave = chaveDeData(data);
           const eventosDoDia = eventosPorDia[chave] ?? [];
-          const aulasDoDia = aulas[data.getDay()] ?? [];
+          const aulasDoDia = (aulas[data.getDay()] ?? []).filter((aula) => aulaValeNaData(aula, chave));
           const ehHoje = chave === chaveDeHoje;
 
           const classes = [

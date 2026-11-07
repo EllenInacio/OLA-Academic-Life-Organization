@@ -86,6 +86,8 @@ export function buscarComDadosAcademicos(id: number) {
           semestre: true,
           cargaHoraria: true,
           horario: true,
+          inicioAulas: true,
+          fimAulas: true,
           regraMedia: true,
           mediaAprovacao: true,
           limiteFaltas: true,

@@ -1,4 +1,9 @@
 import { DIAS_SEMANA, lerHorario } from "./horario";
+import { formatarData } from "./formatacao";
+
+function dataDoPeriodo(valor) {
+  return valor ? String(valor).slice(0, 10) : null;
+}
 
 export function aulasPorDiaDaSemana(disciplinas) {
   const aulas = {};
@@ -11,7 +16,6 @@ export function aulasPorDiaDaSemana(disciplinas) {
       const horario = selecao[sigla];
       if (!horario) return;
 
-      // DIAS_SEMANA começa na segunda; Date.getDay() começa no domingo.
       const diaDaSemana = (posicao + 1) % 7;
       if (!aulas[diaDaSemana]) aulas[diaDaSemana] = [];
       aulas[diaDaSemana].push({
@@ -19,6 +23,8 @@ export function aulasPorDiaDaSemana(disciplinas) {
         nome: disciplina.nome,
         inicio: horario.inicio,
         fim: horario.fim,
+        inicioAulas: dataDoPeriodo(disciplina.inicioAulas),
+        fimAulas: dataDoPeriodo(disciplina.fimAulas),
       });
     });
   }
@@ -28,4 +34,15 @@ export function aulasPorDiaDaSemana(disciplinas) {
   }
 
   return aulas;
+}
+
+export function aulaValeNaData(aula, dataISO) {
+  return (!aula.inicioAulas || dataISO >= aula.inicioAulas) && (!aula.fimAulas || dataISO <= aula.fimAulas);
+}
+
+export function textoPeriodo({ inicioAulas, fimAulas }) {
+  if (inicioAulas && fimAulas) return `Aulas de ${formatarData(inicioAulas)} a ${formatarData(fimAulas)}`;
+  if (inicioAulas) return `Aulas a partir de ${formatarData(inicioAulas)}`;
+  if (fimAulas) return `Aulas até ${formatarData(fimAulas)}`;
+  return "";
 }

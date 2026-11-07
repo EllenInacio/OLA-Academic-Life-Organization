@@ -19,6 +19,8 @@ type DisciplinaComEventosDoBanco = {
   semestre: string | null;
   cargaHoraria: number | null;
   horario: string | null;
+  inicioAulas?: Date | null;
+  fimAulas?: Date | null;
   regraMedia: RegraMedia;
   mediaAprovacao: Decimal | null;
   limiteFaltas: Decimal;
@@ -43,6 +45,8 @@ export function prepararParaCalculo(disciplina: DisciplinaComEventosDoBanco): Di
     semestre: disciplina.semestre,
     cargaHoraria: disciplina.cargaHoraria,
     horario: disciplina.horario,
+    inicioAulas: disciplina.inicioAulas ? paraDataISO(disciplina.inicioAulas) : null,
+    fimAulas: disciplina.fimAulas ? paraDataISO(disciplina.fimAulas) : null,
     regraMedia: disciplina.regraMedia,
     mediaAprovacao: disciplina.mediaAprovacao === null ? null : Number(disciplina.mediaAprovacao),
     limiteFaltas: Number(disciplina.limiteFaltas),

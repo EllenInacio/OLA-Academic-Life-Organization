@@ -78,6 +78,8 @@ export async function exportar(usuarioId: number, ip?: string) {
       semestre: disciplina.semestre,
       cargaHoraria: disciplina.cargaHoraria,
       horario: disciplina.horario,
+      inicioAulas: disciplina.inicioAulas?.toISOString().slice(0, 10) ?? null,
+      fimAulas: disciplina.fimAulas?.toISOString().slice(0, 10) ?? null,
       criteriosDeAvaliacao: {
         regraMedia: disciplina.regraMedia,
         mediaAprovacao: disciplina.mediaAprovacao === null ? null : Number(disciplina.mediaAprovacao),

@@ -49,6 +49,8 @@ export type DisciplinaMinAggregateOutputType = {
   semestre: string | null
   cargaHoraria: number | null
   horario: string | null
+  inicioAulas: Date | null
+  fimAulas: Date | null
   regraMedia: $Enums.RegraMedia | null
   mediaAprovacao: runtime.Decimal | null
   limiteFaltas: runtime.Decimal | null
@@ -63,6 +65,8 @@ export type DisciplinaMaxAggregateOutputType = {
   semestre: string | null
   cargaHoraria: number | null
   horario: string | null
+  inicioAulas: Date | null
+  fimAulas: Date | null
   regraMedia: $Enums.RegraMedia | null
   mediaAprovacao: runtime.Decimal | null
   limiteFaltas: runtime.Decimal | null
@@ -77,6 +81,8 @@ export type DisciplinaCountAggregateOutputType = {
   semestre: number
   cargaHoraria: number
   horario: number
+  inicioAulas: number
+  fimAulas: number
   regraMedia: number
   mediaAprovacao: number
   limiteFaltas: number
@@ -109,6 +115,8 @@ export type DisciplinaMinAggregateInputType = {
   semestre?: true
   cargaHoraria?: true
   horario?: true
+  inicioAulas?: true
+  fimAulas?: true
   regraMedia?: true
   mediaAprovacao?: true
   limiteFaltas?: true
@@ -123,6 +131,8 @@ export type DisciplinaMaxAggregateInputType = {
   semestre?: true
   cargaHoraria?: true
   horario?: true
+  inicioAulas?: true
+  fimAulas?: true
   regraMedia?: true
   mediaAprovacao?: true
   limiteFaltas?: true
@@ -137,6 +147,8 @@ export type DisciplinaCountAggregateInputType = {
   semestre?: true
   cargaHoraria?: true
   horario?: true
+  inicioAulas?: true
+  fimAulas?: true
   regraMedia?: true
   mediaAprovacao?: true
   limiteFaltas?: true
@@ -238,6 +250,8 @@ export type DisciplinaGroupByOutputType = {
   semestre: string | null
   cargaHoraria: number | null
   horario: string | null
+  inicioAulas: Date | null
+  fimAulas: Date | null
   regraMedia: $Enums.RegraMedia
   mediaAprovacao: runtime.Decimal | null
   limiteFaltas: runtime.Decimal
@@ -275,6 +289,8 @@ export type DisciplinaWhereInput = {
   semestre?: Prisma.StringNullableFilter<"Disciplina"> | string | null
   cargaHoraria?: Prisma.IntNullableFilter<"Disciplina"> | number | null
   horario?: Prisma.StringNullableFilter<"Disciplina"> | string | null
+  inicioAulas?: Prisma.DateTimeNullableFilter<"Disciplina"> | Date | string | null
+  fimAulas?: Prisma.DateTimeNullableFilter<"Disciplina"> | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFilter<"Disciplina"> | $Enums.RegraMedia
   mediaAprovacao?: Prisma.DecimalNullableFilter<"Disciplina"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFilter<"Disciplina"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -292,6 +308,8 @@ export type DisciplinaOrderByWithRelationInput = {
   semestre?: Prisma.SortOrderInput | Prisma.SortOrder
   cargaHoraria?: Prisma.SortOrderInput | Prisma.SortOrder
   horario?: Prisma.SortOrderInput | Prisma.SortOrder
+  inicioAulas?: Prisma.SortOrderInput | Prisma.SortOrder
+  fimAulas?: Prisma.SortOrderInput | Prisma.SortOrder
   regraMedia?: Prisma.SortOrder
   mediaAprovacao?: Prisma.SortOrderInput | Prisma.SortOrder
   limiteFaltas?: Prisma.SortOrder
@@ -313,6 +331,8 @@ export type DisciplinaWhereUniqueInput = Prisma.AtLeast<{
   semestre?: Prisma.StringNullableFilter<"Disciplina"> | string | null
   cargaHoraria?: Prisma.IntNullableFilter<"Disciplina"> | number | null
   horario?: Prisma.StringNullableFilter<"Disciplina"> | string | null
+  inicioAulas?: Prisma.DateTimeNullableFilter<"Disciplina"> | Date | string | null
+  fimAulas?: Prisma.DateTimeNullableFilter<"Disciplina"> | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFilter<"Disciplina"> | $Enums.RegraMedia
   mediaAprovacao?: Prisma.DecimalNullableFilter<"Disciplina"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFilter<"Disciplina"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -330,6 +350,8 @@ export type DisciplinaOrderByWithAggregationInput = {
   semestre?: Prisma.SortOrderInput | Prisma.SortOrder
   cargaHoraria?: Prisma.SortOrderInput | Prisma.SortOrder
   horario?: Prisma.SortOrderInput | Prisma.SortOrder
+  inicioAulas?: Prisma.SortOrderInput | Prisma.SortOrder
+  fimAulas?: Prisma.SortOrderInput | Prisma.SortOrder
   regraMedia?: Prisma.SortOrder
   mediaAprovacao?: Prisma.SortOrderInput | Prisma.SortOrder
   limiteFaltas?: Prisma.SortOrder
@@ -352,6 +374,8 @@ export type DisciplinaScalarWhereWithAggregatesInput = {
   semestre?: Prisma.StringNullableWithAggregatesFilter<"Disciplina"> | string | null
   cargaHoraria?: Prisma.IntNullableWithAggregatesFilter<"Disciplina"> | number | null
   horario?: Prisma.StringNullableWithAggregatesFilter<"Disciplina"> | string | null
+  inicioAulas?: Prisma.DateTimeNullableWithAggregatesFilter<"Disciplina"> | Date | string | null
+  fimAulas?: Prisma.DateTimeNullableWithAggregatesFilter<"Disciplina"> | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaWithAggregatesFilter<"Disciplina"> | $Enums.RegraMedia
   mediaAprovacao?: Prisma.DecimalNullableWithAggregatesFilter<"Disciplina"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalWithAggregatesFilter<"Disciplina"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -365,6 +389,8 @@ export type DisciplinaCreateInput = {
   semestre?: string | null
   cargaHoraria?: number | null
   horario?: string | null
+  inicioAulas?: Date | string | null
+  fimAulas?: Date | string | null
   regraMedia?: $Enums.RegraMedia
   mediaAprovacao?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -381,6 +407,8 @@ export type DisciplinaUncheckedCreateInput = {
   semestre?: string | null
   cargaHoraria?: number | null
   horario?: string | null
+  inicioAulas?: Date | string | null
+  fimAulas?: Date | string | null
   regraMedia?: $Enums.RegraMedia
   mediaAprovacao?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -396,6 +424,8 @@ export type DisciplinaUpdateInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -412,6 +442,8 @@ export type DisciplinaUncheckedUpdateInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -428,6 +460,8 @@ export type DisciplinaCreateManyInput = {
   semestre?: string | null
   cargaHoraria?: number | null
   horario?: string | null
+  inicioAulas?: Date | string | null
+  fimAulas?: Date | string | null
   regraMedia?: $Enums.RegraMedia
   mediaAprovacao?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -441,6 +475,8 @@ export type DisciplinaUpdateManyMutationInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -454,6 +490,8 @@ export type DisciplinaUncheckedUpdateManyInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -483,6 +521,8 @@ export type DisciplinaCountOrderByAggregateInput = {
   semestre?: Prisma.SortOrder
   cargaHoraria?: Prisma.SortOrder
   horario?: Prisma.SortOrder
+  inicioAulas?: Prisma.SortOrder
+  fimAulas?: Prisma.SortOrder
   regraMedia?: Prisma.SortOrder
   mediaAprovacao?: Prisma.SortOrder
   limiteFaltas?: Prisma.SortOrder
@@ -505,6 +545,8 @@ export type DisciplinaMaxOrderByAggregateInput = {
   semestre?: Prisma.SortOrder
   cargaHoraria?: Prisma.SortOrder
   horario?: Prisma.SortOrder
+  inicioAulas?: Prisma.SortOrder
+  fimAulas?: Prisma.SortOrder
   regraMedia?: Prisma.SortOrder
   mediaAprovacao?: Prisma.SortOrder
   limiteFaltas?: Prisma.SortOrder
@@ -519,6 +561,8 @@ export type DisciplinaMinOrderByAggregateInput = {
   semestre?: Prisma.SortOrder
   cargaHoraria?: Prisma.SortOrder
   horario?: Prisma.SortOrder
+  inicioAulas?: Prisma.SortOrder
+  fimAulas?: Prisma.SortOrder
   regraMedia?: Prisma.SortOrder
   mediaAprovacao?: Prisma.SortOrder
   limiteFaltas?: Prisma.SortOrder
@@ -643,6 +687,8 @@ export type DisciplinaCreateWithoutUsuarioInput = {
   semestre?: string | null
   cargaHoraria?: number | null
   horario?: string | null
+  inicioAulas?: Date | string | null
+  fimAulas?: Date | string | null
   regraMedia?: $Enums.RegraMedia
   mediaAprovacao?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -658,6 +704,8 @@ export type DisciplinaUncheckedCreateWithoutUsuarioInput = {
   semestre?: string | null
   cargaHoraria?: number | null
   horario?: string | null
+  inicioAulas?: Date | string | null
+  fimAulas?: Date | string | null
   regraMedia?: $Enums.RegraMedia
   mediaAprovacao?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -702,6 +750,8 @@ export type DisciplinaScalarWhereInput = {
   semestre?: Prisma.StringNullableFilter<"Disciplina"> | string | null
   cargaHoraria?: Prisma.IntNullableFilter<"Disciplina"> | number | null
   horario?: Prisma.StringNullableFilter<"Disciplina"> | string | null
+  inicioAulas?: Prisma.DateTimeNullableFilter<"Disciplina"> | Date | string | null
+  fimAulas?: Prisma.DateTimeNullableFilter<"Disciplina"> | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFilter<"Disciplina"> | $Enums.RegraMedia
   mediaAprovacao?: Prisma.DecimalNullableFilter<"Disciplina"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFilter<"Disciplina"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -715,6 +765,8 @@ export type DisciplinaCreateWithoutEventosInput = {
   semestre?: string | null
   cargaHoraria?: number | null
   horario?: string | null
+  inicioAulas?: Date | string | null
+  fimAulas?: Date | string | null
   regraMedia?: $Enums.RegraMedia
   mediaAprovacao?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -730,6 +782,8 @@ export type DisciplinaUncheckedCreateWithoutEventosInput = {
   semestre?: string | null
   cargaHoraria?: number | null
   horario?: string | null
+  inicioAulas?: Date | string | null
+  fimAulas?: Date | string | null
   regraMedia?: $Enums.RegraMedia
   mediaAprovacao?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -760,6 +814,8 @@ export type DisciplinaUpdateWithoutEventosInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -775,6 +831,8 @@ export type DisciplinaUncheckedUpdateWithoutEventosInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -789,6 +847,8 @@ export type DisciplinaCreateWithoutFrequenciasInput = {
   semestre?: string | null
   cargaHoraria?: number | null
   horario?: string | null
+  inicioAulas?: Date | string | null
+  fimAulas?: Date | string | null
   regraMedia?: $Enums.RegraMedia
   mediaAprovacao?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -804,6 +864,8 @@ export type DisciplinaUncheckedCreateWithoutFrequenciasInput = {
   semestre?: string | null
   cargaHoraria?: number | null
   horario?: string | null
+  inicioAulas?: Date | string | null
+  fimAulas?: Date | string | null
   regraMedia?: $Enums.RegraMedia
   mediaAprovacao?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -834,6 +896,8 @@ export type DisciplinaUpdateWithoutFrequenciasInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -849,6 +913,8 @@ export type DisciplinaUncheckedUpdateWithoutFrequenciasInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -864,6 +930,8 @@ export type DisciplinaCreateManyUsuarioInput = {
   semestre?: string | null
   cargaHoraria?: number | null
   horario?: string | null
+  inicioAulas?: Date | string | null
+  fimAulas?: Date | string | null
   regraMedia?: $Enums.RegraMedia
   mediaAprovacao?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -876,6 +944,8 @@ export type DisciplinaUpdateWithoutUsuarioInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -891,6 +961,8 @@ export type DisciplinaUncheckedUpdateWithoutUsuarioInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -906,6 +978,8 @@ export type DisciplinaUncheckedUpdateManyWithoutUsuarioInput = {
   semestre?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cargaHoraria?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   horario?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  inicioAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  fimAulas?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   regraMedia?: Prisma.EnumRegraMediaFieldUpdateOperationsInput | $Enums.RegraMedia
   mediaAprovacao?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   limiteFaltas?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -959,6 +1033,8 @@ export type DisciplinaSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   semestre?: boolean
   cargaHoraria?: boolean
   horario?: boolean
+  inicioAulas?: boolean
+  fimAulas?: boolean
   regraMedia?: boolean
   mediaAprovacao?: boolean
   limiteFaltas?: boolean
@@ -977,6 +1053,8 @@ export type DisciplinaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   semestre?: boolean
   cargaHoraria?: boolean
   horario?: boolean
+  inicioAulas?: boolean
+  fimAulas?: boolean
   regraMedia?: boolean
   mediaAprovacao?: boolean
   limiteFaltas?: boolean
@@ -992,6 +1070,8 @@ export type DisciplinaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   semestre?: boolean
   cargaHoraria?: boolean
   horario?: boolean
+  inicioAulas?: boolean
+  fimAulas?: boolean
   regraMedia?: boolean
   mediaAprovacao?: boolean
   limiteFaltas?: boolean
@@ -1007,6 +1087,8 @@ export type DisciplinaSelectScalar = {
   semestre?: boolean
   cargaHoraria?: boolean
   horario?: boolean
+  inicioAulas?: boolean
+  fimAulas?: boolean
   regraMedia?: boolean
   mediaAprovacao?: boolean
   limiteFaltas?: boolean
@@ -1014,7 +1096,7 @@ export type DisciplinaSelectScalar = {
   criadoEm?: boolean
 }
 
-export type DisciplinaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nome" | "professor" | "semestre" | "cargaHoraria" | "horario" | "regraMedia" | "mediaAprovacao" | "limiteFaltas" | "usuarioId" | "criadoEm", ExtArgs["result"]["disciplina"]>
+export type DisciplinaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nome" | "professor" | "semestre" | "cargaHoraria" | "horario" | "inicioAulas" | "fimAulas" | "regraMedia" | "mediaAprovacao" | "limiteFaltas" | "usuarioId" | "criadoEm", ExtArgs["result"]["disciplina"]>
 export type DisciplinaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   usuario?: boolean | Prisma.UsuarioDefaultArgs<ExtArgs>
   eventos?: boolean | Prisma.Disciplina$eventosArgs<ExtArgs>
@@ -1042,6 +1124,8 @@ export type $DisciplinaPayload<ExtArgs extends runtime.Types.Extensions.Internal
     semestre: string | null
     cargaHoraria: number | null
     horario: string | null
+    inicioAulas: Date | null
+    fimAulas: Date | null
     regraMedia: $Enums.RegraMedia
     mediaAprovacao: runtime.Decimal | null
     limiteFaltas: runtime.Decimal
@@ -1479,6 +1563,8 @@ export interface DisciplinaFieldRefs {
   readonly semestre: Prisma.FieldRef<"Disciplina", 'String'>
   readonly cargaHoraria: Prisma.FieldRef<"Disciplina", 'Int'>
   readonly horario: Prisma.FieldRef<"Disciplina", 'String'>
+  readonly inicioAulas: Prisma.FieldRef<"Disciplina", 'DateTime'>
+  readonly fimAulas: Prisma.FieldRef<"Disciplina", 'DateTime'>
   readonly regraMedia: Prisma.FieldRef<"Disciplina", 'RegraMedia'>
   readonly mediaAprovacao: Prisma.FieldRef<"Disciplina", 'Decimal'>
   readonly limiteFaltas: Prisma.FieldRef<"Disciplina", 'Decimal'>

@@ -1,3 +1,5 @@
+
+
 generator client {
   provider     = "prisma-client"
   output       = "../src/generated/prisma"
@@ -54,6 +56,9 @@ model Disciplina {
   semestre       String?    @db.VarChar(10)
   cargaHoraria   Int?       @map("carga_horaria")
   horario        String?    @db.VarChar(120)
+  // Período em que a disciplina tem aula (opcional): o calendário geral só mostra as aulas dentro dele.
+  inicioAulas    DateTime?  @map("inicio_aulas") @db.Date
+  fimAulas       DateTime?  @map("fim_aulas") @db.Date
   // Critérios de avaliação (Etapa 2)
   regraMedia     RegraMedia @default(PONDERADA) @map("regra_media")
   mediaAprovacao Decimal?   @map("media_aprovacao") @db.Decimal(4, 2)

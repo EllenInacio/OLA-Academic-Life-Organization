@@ -7,12 +7,13 @@ import Pagina from "../components/Pagina";
 import { useDisciplinas } from "../hooks/useDisciplinas";
 import { mensagemDeErro } from "../services/api";
 import { excluirDisciplinaComConfirmacao } from "../utils/excluirDisciplina";
+import { textoPeriodo } from "../utils/aulasDaSemana";
 import { formatarNumero, formatarPercentual, plural } from "../utils/formatacao";
 import { SITUACAO_FREQUENCIA, SITUACAO_NOTA } from "../constants/desempenho";
 import "./DisciplinasPage.css";
 
 function infoComplementar(disciplina) {
-  return [disciplina.horario, disciplina.cargaHoraria ? `${disciplina.cargaHoraria}h` : null]
+  return [disciplina.horario, textoPeriodo(disciplina), disciplina.cargaHoraria ? `${disciplina.cargaHoraria}h` : null]
     .filter(Boolean)
     .join(" · ");
 }

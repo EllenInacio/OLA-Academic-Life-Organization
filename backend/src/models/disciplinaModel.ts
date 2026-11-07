@@ -6,6 +6,11 @@ const COM_DADOS_ACADEMICOS = {
   frequencias: { orderBy: { data: "desc" as const } },
 };
 
+function dataDoPeriodo(valor?: string | null) {
+  if (valor === undefined) return undefined;
+  return valor ? new Date(valor) : null;
+}
+
 function camposDisciplina(dados: DadosDisciplina) {
   return {
     nome: dados.nome,
@@ -13,6 +18,8 @@ function camposDisciplina(dados: DadosDisciplina) {
     semestre: dados.semestre || null,
     cargaHoraria: dados.cargaHoraria ?? null,
     horario: dados.horario || null,
+    inicioAulas: dataDoPeriodo(dados.inicioAulas),
+    fimAulas: dataDoPeriodo(dados.fimAulas),
     regraMedia: dados.regraMedia ?? undefined,
     mediaAprovacao: dados.mediaAprovacao === undefined ? undefined : dados.mediaAprovacao,
     limiteFaltas: dados.limiteFaltas ?? undefined,
@@ -20,9 +27,7 @@ function camposDisciplina(dados: DadosDisciplina) {
 }
 
 export function buscarPorId(usuarioId: number, id: number) {
-  return prisma.disciplina.findFirst(
-    { where: { id, usuarioId } }
-  );
+  return prisma.disciplina.findFirst({ where: { id, usuarioId } });
 }
 
 export function buscarComEventos(usuarioId: number, id: number) {
@@ -42,19 +47,14 @@ export function listarComEventos(usuarioId: number) {
 
 export function buscarPorNome(usuarioId: number, nome: string) {
   return prisma.disciplina.findUnique({
-    where: { usuarioId_nome:
-       { usuarioId, nome } },
+    where: { usuarioId_nome: { usuarioId, nome } },
   });
 }
 
 export async function contarRelacionados(id: number) {
   const [eventos, frequencias] = await Promise.all([
-    prisma.evento.count(
-      { where: { disciplinaId: id } }
-    ),
-    prisma.registroFrequencia.count(
-      { where: { disciplinaId: id } }
-    ),
+    prisma.evento.count({ where: { disciplinaId: id } }),
+    prisma.registroFrequencia.count({ where: { disciplinaId: id } }),
   ]);
   return { eventos, frequencias };
 }
@@ -73,7 +73,5 @@ export function atualizar(id: number, dados: DadosDisciplina) {
 }
 
 export function remover(id: number) {
-  return prisma.disciplina.delete(
-    { where: { id } }
-  );
+  return prisma.disciplina.delete({ where: { id } });
 }

@@ -10,7 +10,7 @@ export type RegistroParaCalculo = {
 
 export type CriteriosDeFrequencia = {
   cargaHoraria: number | null;
-  limiteFaltas: number; // percentual, ex.: 25
+  limiteFaltas: number; 
 };
 
 export type SituacaoFrequencia =

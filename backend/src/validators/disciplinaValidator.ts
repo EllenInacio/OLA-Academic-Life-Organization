@@ -1,6 +1,13 @@
 import { body, query } from "express-validator";
 import { idRules } from "./eventoValidator";
-import { CARGA_HORARIA_MAXIMA, FORMATO_SEMESTRE, REGRAS_MEDIA } from "../types/disciplina";
+import {
+  CARGA_HORARIA_MAXIMA,
+  FORMATO_DATA_AULAS,
+  FORMATO_SEMESTRE,
+  REGRAS_MEDIA,
+} from "../types/disciplina";
+
+const MENSAGEM_DATA_AULAS = "As datas do período das aulas devem estar no formato AAAA-MM-DD.";
 
 export const criarDisciplinaRules = [
   body("nome")
@@ -36,7 +43,32 @@ export const criarDisciplinaRules = [
     .isLength({ max: 120 })
     .withMessage("O horário deve ter no máximo 120 caracteres."),
 
-  // Critérios de avaliação (opcionais; quando ausentes, a edição mantém os valores atuais).
+  body("inicioAulas")
+    .optional({ values: "falsy" })
+    .trim()
+    .matches(FORMATO_DATA_AULAS)
+    .withMessage(MENSAGEM_DATA_AULAS)
+    .bail()
+    .isISO8601({ strict: true })
+    .withMessage(MENSAGEM_DATA_AULAS),
+
+  body("fimAulas")
+    .optional({ values: "falsy" })
+    .trim()
+    .matches(FORMATO_DATA_AULAS)
+    .withMessage(MENSAGEM_DATA_AULAS)
+    .bail()
+    .isISO8601({ strict: true })
+    .withMessage(MENSAGEM_DATA_AULAS)
+    .bail()
+    .custom((fim: string, { req }) => {
+      const inicio = req.body.inicioAulas;
+      if (typeof inicio === "string" && FORMATO_DATA_AULAS.test(inicio.trim()) && fim < inicio.trim()) {
+        throw new Error("A data final das aulas não pode ser anterior à data inicial.");
+      }
+      return true;
+    }),
+
   body("regraMedia")
     .optional()
     .isIn(REGRAS_MEDIA)

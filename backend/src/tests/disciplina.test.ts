@@ -90,6 +90,86 @@ describe("Disciplinas", () => {
     });
   });
 
+  it("cadastra o período das aulas", async () => {
+    const resposta = await request(app).post("/api/disciplinas").set(autorizacao).send({
+      nome: "Cálculo I",
+      horario: "Seg 19:00–22:00",
+      inicioAulas: "2026-08-03",
+      fimAulas: "2026-12-12",
+    });
+
+    expect(resposta.status).toBe(201);
+    expect(resposta.body.inicioAulas.slice(0, 10)).toBe("2026-08-03");
+    expect(resposta.body.fimAulas.slice(0, 10)).toBe("2026-12-12");
+  });
+
+  it("aceita só a data de início, só a de término, aulas em um único dia ou nenhuma data", async () => {
+    const enviar = (nome: string, periodo: Record<string, unknown>) =>
+      request(app).post("/api/disciplinas").set(autorizacao).send({ nome, ...periodo });
+
+    const soInicio = await enviar("A", { inicioAulas: "2026-08-03" });
+    const soFim = await enviar("B", { fimAulas: "2026-12-12" });
+    const umDia = await enviar("C", { inicioAulas: "2026-09-01", fimAulas: "2026-09-01" });
+    const vazio = await enviar("D", { inicioAulas: "", fimAulas: null });
+
+    expect([soInicio.status, soFim.status, umDia.status, vazio.status]).toEqual([201, 201, 201, 201]);
+    expect(soInicio.body.fimAulas).toBeNull();
+    expect(soFim.body.inicioAulas).toBeNull();
+    expect(vazio.body).toMatchObject({ inicioAulas: null, fimAulas: null });
+  });
+
+  it.each(["03/08/2026", "2026-02-30", "amanhã", "2026-08-03T10:00"])(
+    "recusa data de início do período fora do formato AAAA-MM-DD (%p)",
+    async (inicioAulas) => {
+      const resposta = await request(app)
+        .post("/api/disciplinas")
+        .set(autorizacao)
+        .send({ nome: "Cálculo I", inicioAulas });
+
+      expect(resposta.status).toBe(400);
+      expect(resposta.body.erro).toContain("período das aulas");
+    }
+  );
+
+  it("recusa data final do período anterior à data inicial", async () => {
+    const resposta = await request(app)
+      .post("/api/disciplinas")
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", inicioAulas: "2026-12-12", fimAulas: "2026-08-03" });
+
+    expect(resposta.status).toBe(400);
+    expect(resposta.body.erro).toContain("anterior");
+  });
+
+  it("na edição mantém o período se não for enviado e remove se vier vazio", async () => {
+    const criada = await request(app).post("/api/disciplinas").set(autorizacao).send({
+      nome: "Cálculo I",
+      inicioAulas: "2026-08-03",
+      fimAulas: "2026-12-12",
+    });
+    const id = criada.body.id;
+
+    const semPeriodo = await request(app)
+      .put(`/api/disciplinas/${id}`)
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", professor: "Helena" });
+    expect(semPeriodo.status).toBe(200);
+    expect(semPeriodo.body.inicioAulas.slice(0, 10)).toBe("2026-08-03");
+    expect(semPeriodo.body.fimAulas.slice(0, 10)).toBe("2026-12-12");
+
+    const novoFim = await request(app)
+      .put(`/api/disciplinas/${id}`)
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", inicioAulas: "2026-08-03", fimAulas: "2026-11-30" });
+    expect(novoFim.body.fimAulas.slice(0, 10)).toBe("2026-11-30");
+
+    const removido = await request(app)
+      .put(`/api/disciplinas/${id}`)
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", inicioAulas: "", fimAulas: null });
+    expect(removido.body).toMatchObject({ inicioAulas: null, fimAulas: null });
+  });
+
   it("aceita os campos complementares vazios", async () => {
     const resposta = await request(app).post("/api/disciplinas").set(autorizacao).send({
       nome: "Redes",

@@ -1,5 +1,3 @@
-// Indicadores do Dashboard calculados a partir das disciplinas e dos eventos
-// do calendário. Funções puras: recebem os dados já lidos do banco.
 import { StatusEvento, TipoEvento } from "../types/evento";
 import { DIAS_PARA_ALERTA, DIAS_URGENTE, diasEntre } from "./prazos";
 import { Desempenho, RegraMedia, calcularDesempenho, ehAvaliativo } from "./notas";
@@ -12,7 +10,7 @@ export type EventoParaCalculo = {
   id: number;
   titulo: string;
   tipo: TipoEvento;
-  data: string; // AAAA-MM-DD
+  data: string;
   peso: number;
   status: StatusEvento;
   nota: number | null;
@@ -27,6 +25,8 @@ export type DisciplinaParaCalculo = {
   semestre: string | null;
   cargaHoraria: number | null;
   horario: string | null;
+  inicioAulas?: string | null;
+  fimAulas?: string | null;
   regraMedia: RegraMedia;
   mediaAprovacao: number | null;
   limiteFaltas: number;
@@ -38,11 +38,11 @@ export type EventoComPrazo = EventoParaCalculo & { diasRestantes: number };
 
 export type ContagemEventos = {
   total: number;
-  pendentes: number; // status PENDENTE
-  emAndamento: number; // status EM_ANDAMENTO
-  concluidos: number; // status CONCLUIDO
-  abertos: number; // pendentes + em andamento
-  atrasados: number; // abertos com data anterior a hoje
+  pendentes: number; 
+  emAndamento: number; 
+  concluidos: number; 
+  abertos: number; 
+  atrasados: number; 
 };
 
 export type TipoAlerta =
@@ -59,11 +59,9 @@ export type Alerta = {
   nivel: "alto" | "medio";
   disciplina: { id: number; nome: string };
   evento?: EventoComPrazo;
-  // Números usados na mensagem (média, faltas etc.), conforme o tipo do alerta.
   valores?: Record<string, number | null>;
 };
 
-// Alertas sobre o desempenho da disciplina (contam em "disciplinas em atenção").
 const ALERTAS_ACADEMICOS: TipoAlerta[] = [
   "FREQUENCIA_ACIMA_DO_LIMITE",
   "FREQUENCIA_PERTO_DO_LIMITE",
@@ -107,7 +105,6 @@ export function contarEventos(eventos: EventoParaCalculo[], hoje: string): Conta
   return contagem;
 }
 
-/** Eventos não concluídos de hoje em diante, do mais próximo para o mais distante. */
 export function proximosEventos(
   eventos: EventoParaCalculo[],
   hoje: string,
@@ -120,11 +117,6 @@ export function proximosEventos(
     .map((evento) => comPrazo(evento, hoje));
 }
 
-/**
- * PRAZO_PROXIMO: evento não concluído que vence em até DIAS_PARA_ALERTA dias;
- * nível alto quando faltam até DIAS_URGENTE dias.
- * PRAZO_VENCIDO: evento cuja data já passou e que ainda não foi marcado como concluído.
- */
 export function gerarAlertasDePrazo(eventos: EventoParaCalculo[], hoje: string): Alerta[] {
   const abertos = eventos.filter(estaAberto).sort(porDataEId).map((e) => comPrazo(e, hoje));
 
@@ -159,12 +151,6 @@ export function calcularIndicadoresDaDisciplina(disciplina: DisciplinaParaCalcul
   };
 }
 
-/**
- * FREQUENCIA_ACIMA_DO_LIMITE / FREQUENCIA_PERTO_DO_LIMITE: situação da frequência.
- * MEDIA_INALCANCAVEL: nem com 10 nas avaliações restantes chega à média de aprovação.
- * MEDIA_ABAIXO: média (parcial ou final) abaixo da média de aprovação.
- * NOTA_AGUARDANDO: avaliação já concluída, com data passada, ainda sem nota registrada.
- */
 export function gerarAlertasAcademicos(
   disciplina: DisciplinaParaCalculo,
   desempenho: Desempenho,
@@ -222,7 +208,6 @@ export function gerarAlertasAcademicos(
   return alertas;
 }
 
-/** Média geral = média aritmética das médias (parciais) das disciplinas que já têm nota. */
 export function calcularMediaGeral(medias: (number | null)[]) {
   const comNota = medias.filter((m): m is number => m !== null);
   return {
@@ -239,7 +224,6 @@ export function montarPainel(disciplinas: DisciplinaParaCalculo[], hoje: string)
     gerarAlertasAcademicos(d, indicadores[i].desempenho, indicadores[i].frequencia, hoje)
   );
 
-  // Nível alto primeiro; dentro do mesmo nível, mantém a ordem (prazos por data).
   const alertas = [...gerarAlertasDePrazo(eventos, hoje), ...alertasAcademicos].sort(
     (a, b) => Number(b.nivel === "alto") - Number(a.nivel === "alto")
   );
@@ -275,6 +259,8 @@ export function montarPainel(disciplinas: DisciplinaParaCalculo[], hoje: string)
       semestre: disciplina.semestre,
       cargaHoraria: disciplina.cargaHoraria,
       horario: disciplina.horario,
+      inicioAulas: disciplina.inicioAulas ?? null,
+      fimAulas: disciplina.fimAulas ?? null,
       eventos: contarEventos(disciplina.eventos, hoje),
       proximoEvento: proximosEventos(disciplina.eventos, hoje, 1)[0] ?? null,
       desempenho: indicadores[i].desempenho,

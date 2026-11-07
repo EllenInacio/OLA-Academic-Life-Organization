@@ -857,6 +857,8 @@ export const DisciplinaScalarFieldEnum = {
   semestre: 'semestre',
   cargaHoraria: 'cargaHoraria',
   horario: 'horario',
+  inicioAulas: 'inicioAulas',
+  fimAulas: 'fimAulas',
   regraMedia: 'regraMedia',
   mediaAprovacao: 'mediaAprovacao',
   limiteFaltas: 'limiteFaltas',

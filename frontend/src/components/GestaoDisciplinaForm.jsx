@@ -10,6 +10,8 @@ const FORMULARIO_VAZIO = {
   semestre: "",
   cargaHoraria: "",
   horario: "",
+  inicioAulas: "",
+  fimAulas: "",
   regraMedia: "PONDERADA",
   mediaAprovacao: "",
   limiteFaltas: "25",
@@ -25,6 +27,8 @@ function camposDe(disciplina) {
     semestre: disciplina.semestre ?? "",
     cargaHoraria: disciplina.cargaHoraria ? String(disciplina.cargaHoraria) : "",
     horario: disciplina.horario ?? "",
+    inicioAulas: disciplina.inicioAulas ? disciplina.inicioAulas.slice(0, 10) : "",
+    fimAulas: disciplina.fimAulas ? disciplina.fimAulas.slice(0, 10) : "",
     regraMedia: disciplina.regraMedia ?? "PONDERADA",
     mediaAprovacao:
       disciplina.mediaAprovacao === null || disciplina.mediaAprovacao === undefined
@@ -34,7 +38,6 @@ function camposDe(disciplina) {
   };
 }
 
-// Mesmas regras do back-end (validators/disciplinaValidator.ts), para avisar antes de enviar.
 function validar(campos) {
   if (!campos.nome.trim()) return "Informe o nome da disciplina.";
 
@@ -51,6 +54,10 @@ function validar(campos) {
 
   const problemaHorario = validarHorario(campos.horario);
   if (problemaHorario) return problemaHorario;
+
+  if (campos.inicioAulas && campos.fimAulas && campos.fimAulas < campos.inicioAulas) {
+    return "A data final das aulas não pode ser anterior à data inicial.";
+  }
 
   if (campos.mediaAprovacao.trim() !== "") {
     const media = lerNumero(campos.mediaAprovacao);
@@ -101,6 +108,8 @@ const GestaoDisciplinaForm = forwardRef(function GestaoDisciplinaForm(
       semestre: campos.semestre.trim(),
       cargaHoraria: campos.cargaHoraria === "" ? null : Number(campos.cargaHoraria),
       horario: campos.horario.trim(),
+      inicioAulas: campos.inicioAulas || null,
+      fimAulas: campos.fimAulas || null,
       regraMedia: campos.regraMedia,
       mediaAprovacao: campos.mediaAprovacao.trim() === "" ? null : lerNumero(campos.mediaAprovacao),
       limiteFaltas: lerNumero(campos.limiteFaltas),
@@ -169,6 +178,33 @@ const GestaoDisciplinaForm = forwardRef(function GestaoDisciplinaForm(
       </div>
 
       <SeletorHorario valor={campos.horario} aoMudar={(horario) => alterar("horario", horario)} />
+
+      <div className="linha-campos">
+        <div className="campo">
+          <label htmlFor="gestao-inicio-aulas">Início das aulas</label>
+          <input
+            id="gestao-inicio-aulas"
+            type="date"
+            value={campos.inicioAulas}
+            max={campos.fimAulas || undefined}
+            onChange={(e) => alterar("inicioAulas", e.target.value)}
+          />
+        </div>
+
+        <div className="campo">
+          <label htmlFor="gestao-fim-aulas">Fim das aulas</label>
+          <input
+            id="gestao-fim-aulas"
+            type="date"
+            value={campos.fimAulas}
+            min={campos.inicioAulas || undefined}
+            onChange={(e) => alterar("fimAulas", e.target.value)}
+          />
+        </div>
+      </div>
+      <p className="gestao-dica">
+        Opcional. O calendário geral só mostra as aulas dentro desse período; sem datas, elas aparecem sempre.
+      </p>
 
       <fieldset className="gestao-criterios">
         <legend>Critérios de avaliação</legend>
