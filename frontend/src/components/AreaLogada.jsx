@@ -4,6 +4,7 @@ import {
   IconeCalendario,
   IconeDashboard,
   IconeDisciplinas,
+  IconeNotas,
   IconePrivacidade,
   IconeSair,
 } from "./Icones";
@@ -12,6 +13,7 @@ import "./AreaLogada.css";
 const MENU = [
   { para: "/", rotulo: "Dashboard", icone: <IconeDashboard />, exato: true },
   { para: "/calendario", rotulo: "Calendário", icone: <IconeCalendario /> },
+  { para: "/notas-frequencia", rotulo: "Notas e frequência", icone: <IconeNotas /> },
   { para: "/disciplinas", rotulo: "Disciplinas", icone: <IconeDisciplinas /> },
 ];
 

@@ -25,3 +25,11 @@ export const StatusEvento = {
 } as const
 
 export type StatusEvento = (typeof StatusEvento)[keyof typeof StatusEvento]
+
+
+export const RegraMedia = {
+  PONDERADA: 'PONDERADA',
+  ARITMETICA: 'ARITMETICA'
+} as const
+
+export type RegraMedia = (typeof RegraMedia)[keyof typeof RegraMedia]

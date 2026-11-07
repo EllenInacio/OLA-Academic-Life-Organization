@@ -7,7 +7,10 @@ import Pagina from "../components/Pagina";
 import * as disciplinaService from "../services/disciplinaService";
 import { mensagemDeErro } from "../services/api";
 import { excluirDisciplinaComConfirmacao } from "../utils/excluirDisciplina";
-import { formatarData, textoPrazo } from "../utils/formatacao";
+import Selo from "../components/Selo";
+import { BarraFrequencia } from "../components/FrequenciaCard";
+import { SITUACAO_FREQUENCIA, SITUACAO_NOTA, rotuloRegra } from "../constants/desempenho";
+import { formatarData, formatarNumero, formatarPercentual, plural, textoPrazo } from "../utils/formatacao";
 import "./DashboardPage.css";
 import "./DisciplinasPage.css";
 
@@ -56,7 +59,7 @@ export default function DisciplinaDetalhePage() {
       const excluiu = await excluirDisciplinaComConfirmacao(
         disciplina,
         disciplinaService.remover,
-        disciplina.resumo.eventos.total
+        { eventos: disciplina.resumo.eventos.total, frequencias: disciplina.frequencias.length }
       );
       if (excluiu) {
         navigate("/disciplinas", {
@@ -94,7 +97,7 @@ export default function DisciplinaDetalhePage() {
     );
   }
 
-  const { eventos, proximoEvento } = disciplina.resumo;
+  const { eventos, proximoEvento, desempenho, frequencia } = disciplina.resumo;
 
   return (
     <Pagina
@@ -102,6 +105,9 @@ export default function DisciplinaDetalhePage() {
       subtitulo={subtitulo(disciplina)}
       acoes={
         <>
+          <Link to={`/notas-frequencia?disciplina=${disciplina.id}`} className="botao-principal">
+            Notas e frequência
+          </Link>
           <Link to={`/disciplinas?editar=${disciplina.id}`} className="botao-secundario">
             Editar
           </Link>
@@ -144,6 +150,69 @@ export default function DisciplinaDetalhePage() {
             </span>
           )}
         </div>
+      </div>
+
+      <div className="painel-colunas">
+        <section className="painel-bloco" aria-labelledby="titulo-desempenho">
+          <h2 id="titulo-desempenho" className="painel-titulo">
+            Desempenho
+          </h2>
+          <p className="painel-nota">
+            {rotuloRegra(desempenho.regraMedia)}
+            {desempenho.mediaAprovacao !== null
+              ? ` · aprovação com ${formatarNumero(desempenho.mediaAprovacao)}`
+              : " · média de aprovação não definida"}
+          </p>
+          <div className="detalhe-destaque">
+            <strong>{desempenho.media === null ? "—" : formatarNumero(desempenho.media)}</strong>
+            <div>
+              <Selo situacao={desempenho.situacao} mapa={SITUACAO_NOTA} />
+              <p className="painel-nota">
+                {desempenho.avaliacoes.total === 0
+                  ? "Nenhuma avaliação (evento com peso) cadastrada."
+                  : `${desempenho.avaliacoes.comNota} de ${plural(desempenho.avaliacoes.total, "avaliação com nota", "avaliações com nota")}${desempenho.final ? " (média final)" : " (média parcial)"}`}
+              </p>
+            </div>
+          </div>
+          {desempenho.notaNecessaria && desempenho.notaNecessaria.alcancavel && desempenho.notaNecessaria.valor > 0 && (
+            <p className="painel-nota">
+              Para chegar à média: {formatarNumero(desempenho.notaNecessaria.valor)} nas avaliações restantes.
+            </p>
+          )}
+          {desempenho.notaNecessaria && !desempenho.notaNecessaria.alcancavel && (
+            <p className="painel-nota texto-critico-inline">
+              A média de aprovação não é mais alcançável com as avaliações cadastradas.
+            </p>
+          )}
+        </section>
+
+        <section className="painel-bloco" aria-labelledby="titulo-freq-disciplina">
+          <h2 id="titulo-freq-disciplina" className="painel-titulo">
+            Frequência
+          </h2>
+          <p className="painel-nota">Limite de reprovação: {formatarPercentual(frequencia.limiteFaltas)} de faltas</p>
+          <div className="detalhe-destaque">
+            <strong>
+              {frequencia.percentualFaltas === null ? "—" : formatarPercentual(frequencia.percentualFaltas)}
+            </strong>
+            <div>
+              <Selo situacao={frequencia.situacao} mapa={SITUACAO_FREQUENCIA} />
+              <p className="painel-nota">
+                {frequencia.aulasRegistradas === 0
+                  ? "Nenhuma aula registrada."
+                  : `${plural(frequencia.faltas, "falta", "faltas")} em ${plural(frequencia.aulasRegistradas, "aula registrada", "aulas registradas")}`}
+              </p>
+            </div>
+          </div>
+          {frequencia.aulasRegistradas > 0 && <BarraFrequencia frequencia={frequencia} />}
+          <p className="painel-nota">
+            {frequencia.faltasPermitidas === null
+              ? "Cadastre a carga horária para saber quantas faltas ainda são permitidas."
+              : frequencia.faltasRestantes >= 0
+                ? `Ainda pode faltar ${plural(frequencia.faltasRestantes, "aula", "aulas")} (limite: ${frequencia.faltasPermitidas}).`
+                : `Limite de ${frequencia.faltasPermitidas} faltas ultrapassado.`}
+          </p>
+        </section>
       </div>
 
       <section className="painel-bloco" aria-labelledby="titulo-eventos-disciplina">

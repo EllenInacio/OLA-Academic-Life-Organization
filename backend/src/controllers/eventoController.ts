@@ -2,15 +2,21 @@ import { Request, Response } from "express";
 import * as eventoService from "../services/eventoService";
 import * as auditoriaService from "../services/auditoriaService";
 import { AcaoAuditoria } from "../types/auditoria";
-import { DadosEvento } from "../types/evento";
+import { DadosEvento, DadosNota } from "../types/evento";
+import { formatarNumero } from "../utils/formatacao";
 import { ipDaRequisicao } from "../utils/requisicao";
 
-function registrarAcao(req: Request, acao: AcaoAuditoria, evento: { id: number; titulo: string }) {
+function registrarAcao(
+  req: Request,
+  acao: AcaoAuditoria,
+  evento: { id: number; titulo: string },
+  detalhe = evento.titulo
+) {
   return auditoriaService.registrar(acao, {
     usuarioId: req.usuarioId,
     entidade: "evento",
     entidadeId: evento.id,
-    detalhe: evento.titulo,
+    detalhe,
     ip: ipDaRequisicao(req),
   });
 }
@@ -28,6 +34,14 @@ export async function buscarPorId(req: Request, res: Response) {
 export async function criar(req: Request, res: Response) {
   const evento = await eventoService.criar(req.usuarioId!, req.body as DadosEvento);
   await registrarAcao(req, "EVENTO_CRIADO", evento);
+  if (evento.nota !== null) {
+    await registrarAcao(
+      req,
+      "NOTA_LANCADA",
+      evento,
+      `${evento.titulo}: ${formatarNumero(Number(evento.nota))} de ${formatarNumero(Number(evento.notaMaxima))}`
+    );
+  }
   res.status(201).json(evento);
 }
 
@@ -38,6 +52,27 @@ export async function atualizar(req: Request, res: Response) {
     req.body as DadosEvento
   );
   await registrarAcao(req, "EVENTO_ALTERADO", evento);
+  res.json(evento);
+}
+
+export async function lancarNota(req: Request, res: Response) {
+  const evento = await eventoService.lancarNota(
+    req.usuarioId!,
+    Number(req.params.id),
+    req.body as DadosNota
+  );
+  await registrarAcao(
+    req,
+    "NOTA_LANCADA",
+    evento,
+    `${evento.titulo}: ${formatarNumero(Number(evento.nota))} de ${formatarNumero(Number(evento.notaMaxima))}`
+  );
+  res.json(evento);
+}
+
+export async function removerNota(req: Request, res: Response) {
+  const evento = await eventoService.removerNota(req.usuarioId!, Number(req.params.id));
+  await registrarAcao(req, "NOTA_REMOVIDA", evento);
   res.json(evento);
 }
 

@@ -21,10 +21,19 @@ function evento(dados: Partial<EventoParaCalculo> & Pick<EventoParaCalculo, "dat
     tipo: "PROVA",
     peso: 1,
     status: "PENDENTE",
+    nota: null,
+    notaMaxima: 10,
     disciplina: CALCULO,
     ...dados,
   };
 }
+
+const CRITERIOS_PADRAO = {
+  regraMedia: "PONDERADA" as const,
+  mediaAprovacao: null,
+  limiteFaltas: 25,
+  frequencias: [],
+};
 
 describe("Cálculos de prazo", () => {
   it("usa o fuso de Brasília para definir o dia de hoje", () => {
@@ -111,12 +120,12 @@ describe("Indicadores do Dashboard", () => {
 
     const alertas = gerarAlertasDePrazo(eventos, HOJE);
 
-    expect(alertas.map((a) => [a.tipo, a.nivel, a.evento.titulo])).toEqual([
+    expect(alertas.map((a) => [a.tipo, a.nivel, a.evento!.titulo])).toEqual([
       ["PRAZO_PROXIMO", "alto", "Em 2 dias"],
       ["PRAZO_PROXIMO", "medio", "Em 7 dias"],
       ["PRAZO_VENCIDO", "medio", "Vencido"],
     ]);
-    expect(alertas[2].evento.diasRestantes).toBe(-8);
+    expect(alertas[2].evento!.diasRestantes).toBe(-8);
   });
 
   it("monta o painel sem inventar dados quando não há disciplinas", () => {
@@ -126,6 +135,9 @@ describe("Indicadores do Dashboard", () => {
       disciplinas: 0,
       eventos: { total: 0, pendentes: 0, emAndamento: 0, concluidos: 0, abertos: 0, atrasados: 0 },
       prazosProximos: 0,
+      mediaGeral: { valor: null, disciplinasComNota: 0 },
+      avaliacoesAguardandoNota: 0,
+      disciplinasEmAtencao: 0,
     });
     expect(painel.proximosEventos).toEqual([]);
     expect(painel.alertas).toEqual([]);
@@ -137,6 +149,7 @@ describe("Indicadores do Dashboard", () => {
     const disciplinas: DisciplinaParaCalculo[] = [
       {
         ...BANCO,
+        ...CRITERIOS_PADRAO,
         professor: null,
         semestre: "2026.2",
         cargaHoraria: 64,
@@ -148,6 +161,7 @@ describe("Indicadores do Dashboard", () => {
       },
       {
         ...CALCULO,
+        ...CRITERIOS_PADRAO,
         professor: "Helena",
         semestre: "2026.1",
         cargaHoraria: null,

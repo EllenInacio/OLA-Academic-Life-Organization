@@ -46,7 +46,12 @@ describe("LGPD", () => {
 
     expect(resposta.status).toBe(200);
     expect(resposta.body.dadosPessoais.email).toBe("aluna@example.com");
-    expect(resposta.body.dadosAcademicos).toEqual({ disciplinas: 1, eventos: 1 });
+    expect(resposta.body.dadosAcademicos).toEqual({
+      disciplinas: 1,
+      eventos: 1,
+      notasLancadas: 0,
+      registrosFrequencia: 0,
+    });
     expect(JSON.stringify(resposta.body)).not.toMatch(/senhaHash|segredo2fa|argon2/);
   });
 

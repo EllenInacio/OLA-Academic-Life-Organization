@@ -13,6 +13,7 @@ export function dataDeHoje(agora = new Date(), fuso = process.env.APP_TIMEZONE |
     day: "2-digit",
   }).format(agora);
 }
+
 export function paraDataISO(data: Date | string) {
   return typeof data === "string" ? data.slice(0, 10) : data.toISOString().slice(0, 10);
 }

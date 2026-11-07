@@ -16,7 +16,7 @@ export default function TermosPrivacidade() {
       <p>
         O OLA é uma plataforma web desenvolvida como Projeto Final de Curso de Engenharia de
         Software da Universidade de Mogi das Cruzes (UMC) para que estudantes organizem
-        disciplinas, provas, trabalhos e entregas.
+        disciplinas, provas, trabalhos, entregas, notas e frequência.
       </p>
       <p>
         A conta é pessoal. Você é responsável por manter em segurança sua senha e o aplicativo
@@ -42,7 +42,8 @@ export default function TermosPrivacidade() {
         </li>
         <li>
           <strong>Dados acadêmicos:</strong> disciplinas, professores, provas, trabalhos e
-          entregas, com datas, pesos e status, para o funcionamento do calendário.
+          entregas (com datas, pesos e status), notas das avaliações e registros de frequência
+          lançados por você, para o calendário, o cálculo de médias e de faltas e o dashboard.
         </li>
         <li>
           <strong>Registros de auditoria:</strong> ação realizada, data, hora e endereço IP,

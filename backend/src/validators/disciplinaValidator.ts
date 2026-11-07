@@ -1,6 +1,6 @@
 import { body, query } from "express-validator";
 import { idRules } from "./eventoValidator";
-import { CARGA_HORARIA_MAXIMA, FORMATO_SEMESTRE } from "../types/disciplina";
+import { CARGA_HORARIA_MAXIMA, FORMATO_SEMESTRE, REGRAS_MEDIA } from "../types/disciplina";
 
 export const criarDisciplinaRules = [
   body("nome")
@@ -35,6 +35,24 @@ export const criarDisciplinaRules = [
     .trim()
     .isLength({ max: 120 })
     .withMessage("O horário deve ter no máximo 120 caracteres."),
+
+  // Critérios de avaliação (opcionais; quando ausentes, a edição mantém os valores atuais).
+  body("regraMedia")
+    .optional()
+    .isIn(REGRAS_MEDIA)
+    .withMessage("Regra da média inválida. Use PONDERADA ou ARITMETICA."),
+
+  body("mediaAprovacao")
+    .optional({ values: "null" })
+    .isFloat({ min: 0, max: 10 })
+    .withMessage("A média de aprovação deve ser um número entre 0 e 10.")
+    .toFloat(),
+
+  body("limiteFaltas")
+    .optional()
+    .isFloat({ gt: 0, max: 100 })
+    .withMessage("O limite de faltas deve ser um percentual maior que 0 e até 100.")
+    .toFloat(),
 ];
 
 export const atualizarDisciplinaRules = [...idRules, ...criarDisciplinaRules];

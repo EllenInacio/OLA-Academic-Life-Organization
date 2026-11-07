@@ -18,7 +18,12 @@ export type AcaoAuditoria =
   | "DISCIPLINA_EXCLUIDA"
   | "EVENTO_CRIADO"
   | "EVENTO_ALTERADO"
-  | "EVENTO_EXCLUIDO";
+  | "EVENTO_EXCLUIDO"
+  | "NOTA_LANCADA"
+  | "NOTA_REMOVIDA"
+  | "FREQUENCIA_REGISTRADA"
+  | "FREQUENCIA_ALTERADA"
+  | "FREQUENCIA_EXCLUIDA";
 
 export type DadosAuditoria = {
   usuarioId?: number | null;

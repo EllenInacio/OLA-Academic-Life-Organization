@@ -11,5 +11,6 @@
 export type * from './models/Usuario'
 export type * from './models/Disciplina'
 export type * from './models/Evento'
+export type * from './models/RegistroFrequencia'
 export type * from './models/LogAuditoria'
 export type * from './commonInputTypes'

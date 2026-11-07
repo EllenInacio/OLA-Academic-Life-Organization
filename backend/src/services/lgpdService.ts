@@ -34,6 +34,11 @@ export async function consultarDados(usuarioId: number, ip?: string) {
     dadosAcademicos: {
       disciplinas: titular.disciplinas.length,
       eventos: titular.disciplinas.reduce((total, d) => total + d.eventos.length, 0),
+      notasLancadas: titular.disciplinas.reduce(
+        (total, d) => total + d.eventos.filter((e) => e.nota !== null).length,
+        0
+      ),
+      registrosFrequencia: titular.disciplinas.reduce((total, d) => total + d.frequencias.length, 0),
     },
     finalidade: FINALIDADE_TRATAMENTO,
     baseLegal: BASE_LEGAL,
@@ -73,6 +78,11 @@ export async function exportar(usuarioId: number, ip?: string) {
       semestre: disciplina.semestre,
       cargaHoraria: disciplina.cargaHoraria,
       horario: disciplina.horario,
+      criteriosDeAvaliacao: {
+        regraMedia: disciplina.regraMedia,
+        mediaAprovacao: disciplina.mediaAprovacao === null ? null : Number(disciplina.mediaAprovacao),
+        limiteFaltas: Number(disciplina.limiteFaltas),
+      },
       criadaEm: disciplina.criadoEm,
       eventos: disciplina.eventos.map((evento) => ({
         titulo: evento.titulo,
@@ -80,6 +90,13 @@ export async function exportar(usuarioId: number, ip?: string) {
         data: evento.data.toISOString().slice(0, 10),
         peso: Number(evento.peso),
         status: evento.status,
+        nota: evento.nota === null ? null : Number(evento.nota),
+        notaMaxima: Number(evento.notaMaxima),
+      })),
+      frequencia: disciplina.frequencias.map((registro) => ({
+        data: registro.data.toISOString().slice(0, 10),
+        quantidadeAulas: registro.quantidadeAulas,
+        faltas: registro.faltas,
       })),
     })),
     historicoAuditoria: logs.map((log) => ({

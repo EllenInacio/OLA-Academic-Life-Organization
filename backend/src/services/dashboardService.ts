@@ -1,12 +1,16 @@
 import * as disciplinaModel from "../models/disciplinaModel";
 import {
   DisciplinaParaCalculo,
+  calcularIndicadoresDaDisciplina,
   contarEventos,
   montarPainel,
   proximosEventos,
 } from "../calculos/painel";
+import { RegraMedia } from "../calculos/notas";
 import { dataDeHoje, paraDataISO } from "../calculos/prazos";
 import { StatusEvento, TipoEvento } from "../types/evento";
+
+type Decimal = { toString(): string } | number;
 
 type DisciplinaComEventosDoBanco = {
   id: number;
@@ -15,17 +19,22 @@ type DisciplinaComEventosDoBanco = {
   semestre: string | null;
   cargaHoraria: number | null;
   horario: string | null;
+  regraMedia: RegraMedia;
+  mediaAprovacao: Decimal | null;
+  limiteFaltas: Decimal;
   eventos: {
     id: number;
     titulo: string;
     tipo: TipoEvento;
     data: Date;
-    peso: { toString(): string } | number;
+    peso: Decimal;
     status: StatusEvento;
+    nota: Decimal | null;
+    notaMaxima: Decimal;
   }[];
+  frequencias: { quantidadeAulas: number; faltas: number }[];
 };
 
-/** Converte o registro do Prisma (DATE e DECIMAL) para os tipos usados nos cálculos. */
 export function prepararParaCalculo(disciplina: DisciplinaComEventosDoBanco): DisciplinaParaCalculo {
   return {
     id: disciplina.id,
@@ -34,6 +43,9 @@ export function prepararParaCalculo(disciplina: DisciplinaComEventosDoBanco): Di
     semestre: disciplina.semestre,
     cargaHoraria: disciplina.cargaHoraria,
     horario: disciplina.horario,
+    regraMedia: disciplina.regraMedia,
+    mediaAprovacao: disciplina.mediaAprovacao === null ? null : Number(disciplina.mediaAprovacao),
+    limiteFaltas: Number(disciplina.limiteFaltas),
     eventos: disciplina.eventos.map((evento) => ({
       id: evento.id,
       titulo: evento.titulo,
@@ -41,17 +53,24 @@ export function prepararParaCalculo(disciplina: DisciplinaComEventosDoBanco): Di
       data: paraDataISO(evento.data),
       peso: Number(evento.peso),
       status: evento.status,
+      nota: evento.nota === null ? null : Number(evento.nota),
+      notaMaxima: Number(evento.notaMaxima),
       disciplina: { id: disciplina.id, nome: disciplina.nome },
+    })),
+    frequencias: disciplina.frequencias.map((registro) => ({
+      quantidadeAulas: registro.quantidadeAulas,
+      faltas: registro.faltas,
     })),
   };
 }
 
 export function resumirDisciplina(disciplina: DisciplinaComEventosDoBanco, hoje = dataDeHoje()) {
-  const { eventos } = prepararParaCalculo(disciplina);
+  const preparada = prepararParaCalculo(disciplina);
 
   return {
-    eventos: contarEventos(eventos, hoje),
-    proximoEvento: proximosEventos(eventos, hoje, 1)[0] ?? null,
+    eventos: contarEventos(preparada.eventos, hoje),
+    proximoEvento: proximosEventos(preparada.eventos, hoje, 1)[0] ?? null,
+    ...calcularIndicadoresDaDisciplina(preparada, hoje),
   };
 }
 

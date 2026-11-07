@@ -54,6 +54,7 @@ export const ModelName = {
   Usuario: 'Usuario',
   Disciplina: 'Disciplina',
   Evento: 'Evento',
+  RegistroFrequencia: 'RegistroFrequencia',
   LogAuditoria: 'LogAuditoria'
 } as const
 
@@ -100,6 +101,9 @@ export const DisciplinaScalarFieldEnum = {
   semestre: 'semestre',
   cargaHoraria: 'cargaHoraria',
   horario: 'horario',
+  regraMedia: 'regraMedia',
+  mediaAprovacao: 'mediaAprovacao',
+  limiteFaltas: 'limiteFaltas',
   usuarioId: 'usuarioId',
   criadoEm: 'criadoEm'
 } as const
@@ -114,12 +118,27 @@ export const EventoScalarFieldEnum = {
   data: 'data',
   peso: 'peso',
   status: 'status',
+  nota: 'nota',
+  notaMaxima: 'notaMaxima',
   disciplinaId: 'disciplinaId',
   criadoEm: 'criadoEm',
   atualizadoEm: 'atualizadoEm'
 } as const
 
 export type EventoScalarFieldEnum = (typeof EventoScalarFieldEnum)[keyof typeof EventoScalarFieldEnum]
+
+
+export const RegistroFrequenciaScalarFieldEnum = {
+  id: 'id',
+  data: 'data',
+  quantidadeAulas: 'quantidadeAulas',
+  faltas: 'faltas',
+  disciplinaId: 'disciplinaId',
+  criadoEm: 'criadoEm',
+  atualizadoEm: 'atualizadoEm'
+} as const
+
+export type RegistroFrequenciaScalarFieldEnum = (typeof RegistroFrequenciaScalarFieldEnum)[keyof typeof RegistroFrequenciaScalarFieldEnum]
 
 
 export const LogAuditoriaScalarFieldEnum = {

@@ -78,8 +78,10 @@ function gerarCelulas(mesVisivel) {
   return celulas;
 }
 
-export default function CalendarioMensal({ eventos = [] }) {
+
+export default function CalendarioMensal({ eventos = [], aulas = {} }) {
   const hoje = new Date();
+  const temAulas = Object.keys(aulas).length > 0;
 
   const [mesVisivel, setMesVisivel] = useState(
     new Date(hoje.getFullYear(), hoje.getMonth(), 1)
@@ -153,6 +155,7 @@ export default function CalendarioMensal({ eventos = [] }) {
         {celulas.map(({ data, doMesAtual }) => {
           const chave = chaveDeData(data);
           const eventosDoDia = eventosPorDia[chave] ?? [];
+          const aulasDoDia = aulas[data.getDay()] ?? [];
           const ehHoje = chave === chaveDeHoje;
 
           const classes = [
@@ -179,6 +182,16 @@ export default function CalendarioMensal({ eventos = [] }) {
                     {evento.titulo}
                   </span>
                 ))}
+
+                {aulasDoDia.map((aula) => (
+                  <span
+                    key={`aula-${aula.id}`}
+                    className="calendario-chip chip-aula"
+                    title={`Aula de ${aula.nome} — ${aula.inicio} às ${aula.fim}`}
+                  >
+                    {aula.inicio} {aula.nome}
+                  </span>
+                ))}
               </div>
             </div>
           );
@@ -189,6 +202,7 @@ export default function CalendarioMensal({ eventos = [] }) {
         <span className="calendario-chip chip-prova">Prova</span>
         <span className="calendario-chip chip-trabalho">Trabalho</span>
         <span className="calendario-chip chip-entrega">Entrega</span>
+        {temAulas && <span className="calendario-chip chip-aula">Aula</span>}
       </footer>
     </section>
   );

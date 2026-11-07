@@ -72,15 +72,21 @@ describe("Dashboard", () => {
       disciplinas: 2,
       eventos: { total: 4, pendentes: 2, emAndamento: 1, concluidos: 1, abertos: 3, atrasados: 1 },
       prazosProximos: 1,
+      mediaGeral: { valor: null, disciplinasComNota: 0 },
+      avaliacoesAguardandoNota: 2, // "Lista 1" e "Lista atrasada": data passada, sem nota
+      disciplinasEmAtencao: 0,
     });
     expect(painel.proximosEventos.map((e: { titulo: string; diasRestantes: number }) => [e.titulo, e.diasRestantes])).toEqual([
       ["Prova de SQL", 2],
       ["Prova 2", 11],
     ]);
     expect(painel.proximosEventos[0].disciplina).toEqual({ id: banco, nome: "Banco de Dados" });
-    expect(painel.alertas.map((a: { tipo: string; nivel: string; evento: { titulo: string } }) => [a.tipo, a.nivel, a.evento.titulo])).toEqual([
+    type AlertaResposta = { tipo: string; nivel: string; evento?: { titulo: string }; disciplina: { nome: string } };
+    expect(painel.alertas.map((a: AlertaResposta) => [a.tipo, a.nivel, a.evento?.titulo ?? a.disciplina.nome])).toEqual([
       ["PRAZO_PROXIMO", "alto", "Prova de SQL"],
       ["PRAZO_VENCIDO", "medio", "Lista atrasada"],
+      // "Lista 1" está concluída, com data passada e sem nota lançada
+      ["NOTA_AGUARDANDO", "medio", "Banco de Dados"],
     ]);
     expect(painel.disciplinas.map((d: { nome: string; eventos: { total: number } }) => [d.nome, d.eventos.total])).toEqual([
       ["Banco de Dados", 2],

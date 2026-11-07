@@ -9,17 +9,11 @@ type NovoUsuario = {
 };
 
 export function buscarPorId(id: number) {
-  return prisma.usuario.findUnique(
-    { where: 
-    { id }
-   });
+  return prisma.usuario.findUnique({ where: { id } });
 }
 
 export function buscarPorEmail(email: string) {
-  return prisma.usuario.findUnique(
-    { where: 
-    { email } 
-  });
+  return prisma.usuario.findUnique({ where: { email } });
 }
 
 export function criar(dados: NovoUsuario) {
@@ -92,10 +86,25 @@ export function buscarComDadosAcademicos(id: number) {
           semestre: true,
           cargaHoraria: true,
           horario: true,
+          regraMedia: true,
+          mediaAprovacao: true,
+          limiteFaltas: true,
           criadoEm: true,
           eventos: {
             orderBy: { data: "asc" },
-            select: { titulo: true, tipo: true, data: true, peso: true, status: true },
+            select: {
+              titulo: true,
+              tipo: true,
+              data: true,
+              peso: true,
+              status: true,
+              nota: true,
+              notaMaxima: true,
+            },
+          },
+          frequencias: {
+            orderBy: { data: "asc" },
+            select: { data: true, quantidadeAulas: true, faltas: true },
           },
         },
       },

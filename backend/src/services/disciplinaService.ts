@@ -3,6 +3,7 @@ import * as disciplinaModel from "../models/disciplinaModel";
 import { DadosDisciplina } from "../types/disciplina";
 import { dataDeHoje, diasEntre, paraDataISO } from "../calculos/prazos";
 import { resumirDisciplina } from "./dashboardService";
+import { plural } from "../utils/formatacao";
 
 const NOME_REPETIDO = "Já existe uma disciplina com esse nome.";
 const NAO_ENCONTRADA = "Disciplina não encontrada.";
@@ -12,12 +13,22 @@ function ehNomeRepetido(erro: unknown) {
 }
 
 export async function listar(usuarioId: number) {
-  const disciplinas = await disciplinaModel.listar(usuarioId);
+  const disciplinas = await disciplinaModel.listarComEventos(usuarioId);
+  const hoje = dataDeHoje();
 
-  return disciplinas.map(({ _count, ...disciplina }) => ({
-    ...disciplina,
-    totalEventos: _count.eventos,
-  }));
+  return disciplinas.map(({ eventos, frequencias, ...disciplina }) => {
+    const resumo = resumirDisciplina({ ...disciplina, eventos, frequencias }, hoje);
+
+    return {
+      ...disciplina,
+      totalEventos: eventos.length,
+      totalFrequencias: frequencias.length,
+      media: resumo.desempenho.media,
+      situacaoNota: resumo.desempenho.situacao,
+      percentualFaltas: resumo.frequencia.percentualFaltas,
+      situacaoFrequencia: resumo.frequencia.situacao,
+    };
+  });
 }
 
 export async function buscarDetalhes(usuarioId: number, id: number) {
@@ -74,6 +85,7 @@ export async function atualizar(usuarioId: number, id: number, dados: DadosDisci
     throw erro;
   }
 }
+
 export async function remover(usuarioId: number, id: number, confirmar: boolean) {
   const disciplina = await disciplinaModel.buscarPorId(usuarioId, id);
 
@@ -81,17 +93,19 @@ export async function remover(usuarioId: number, id: number, confirmar: boolean)
     throw new AppError(NAO_ENCONTRADA, 404);
   }
 
-  const eventos = await disciplinaModel.contarEventos(id);
+  const relacionados = await disciplinaModel.contarRelacionados(id);
+  const { eventos, frequencias } = relacionados;
 
-  if (eventos > 0 && !confirmar) {
+  if ((eventos > 0 || frequencias > 0) && !confirmar) {
     throw new AppError(
-      `A disciplina "${disciplina.nome}" possui ${eventos} evento(s) no calendário. ` +
-        "Confirme a exclusão para remover a disciplina e os eventos vinculados.",
+      `A disciplina "${disciplina.nome}" possui ${plural(eventos, "evento", "eventos")} no calendário e ` +
+        `${plural(frequencias, "registro", "registros")} de frequência. ` +
+        "Confirme a exclusão para remover a disciplina e os dados vinculados.",
       409,
-      { eventos }
+      relacionados
     );
   }
 
   await disciplinaModel.remover(id);
-  return { disciplina, eventosRemovidos: eventos };
+  return { disciplina, removidos: relacionados };
 }

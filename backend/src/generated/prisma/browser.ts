@@ -33,6 +33,11 @@ export type Disciplina = Prisma.DisciplinaModel
  */
 export type Evento = Prisma.EventoModel
 /**
+ * Model RegistroFrequencia
+ * 
+ */
+export type RegistroFrequencia = Prisma.RegistroFrequenciaModel
+/**
  * Model LogAuditoria
  * 
  */

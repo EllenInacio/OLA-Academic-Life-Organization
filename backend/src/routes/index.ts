@@ -4,6 +4,7 @@ import lgpdRoutes from "./lgpdRoutes";
 import disciplinaRoutes from "./disciplinaRoutes";
 import eventoRoutes from "./eventoRoutes";
 import dashboardRoutes from "./dashboardRoutes";
+import frequenciaRoutes from "./frequenciaRoutes";
 import { autenticar } from "../middlewares/autenticacao";
 
 const router = Router();
@@ -17,5 +18,6 @@ router.use("/lgpd", lgpdRoutes);
 router.use("/disciplinas", autenticar, disciplinaRoutes);
 router.use("/eventos", autenticar, eventoRoutes);
 router.use("/dashboard", autenticar, dashboardRoutes);
+router.use("/frequencias", autenticar, frequenciaRoutes);
 
 export default router;

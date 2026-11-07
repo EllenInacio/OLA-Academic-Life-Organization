@@ -400,6 +400,7 @@ export const ModelName = {
   Usuario: 'Usuario',
   Disciplina: 'Disciplina',
   Evento: 'Evento',
+  RegistroFrequencia: 'RegistroFrequencia',
   LogAuditoria: 'LogAuditoria'
 } as const
 
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "usuario" | "disciplina" | "evento" | "logAuditoria"
+    modelProps: "usuario" | "disciplina" | "evento" | "registroFrequencia" | "logAuditoria"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -642,6 +643,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RegistroFrequencia: {
+      payload: Prisma.$RegistroFrequenciaPayload<ExtArgs>
+      fields: Prisma.RegistroFrequenciaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RegistroFrequenciaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RegistroFrequenciaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload>
+        }
+        findFirst: {
+          args: Prisma.RegistroFrequenciaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RegistroFrequenciaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload>
+        }
+        findMany: {
+          args: Prisma.RegistroFrequenciaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload>[]
+        }
+        create: {
+          args: Prisma.RegistroFrequenciaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload>
+        }
+        createMany: {
+          args: Prisma.RegistroFrequenciaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RegistroFrequenciaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload>[]
+        }
+        delete: {
+          args: Prisma.RegistroFrequenciaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload>
+        }
+        update: {
+          args: Prisma.RegistroFrequenciaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload>
+        }
+        deleteMany: {
+          args: Prisma.RegistroFrequenciaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RegistroFrequenciaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RegistroFrequenciaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload>[]
+        }
+        upsert: {
+          args: Prisma.RegistroFrequenciaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistroFrequenciaPayload>
+        }
+        aggregate: {
+          args: Prisma.RegistroFrequenciaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRegistroFrequencia>
+        }
+        groupBy: {
+          args: Prisma.RegistroFrequenciaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RegistroFrequenciaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RegistroFrequenciaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RegistroFrequenciaCountAggregateOutputType> | number
+        }
+      }
+    }
     LogAuditoria: {
       payload: Prisma.$LogAuditoriaPayload<ExtArgs>
       fields: Prisma.LogAuditoriaFieldRefs
@@ -782,6 +857,9 @@ export const DisciplinaScalarFieldEnum = {
   semestre: 'semestre',
   cargaHoraria: 'cargaHoraria',
   horario: 'horario',
+  regraMedia: 'regraMedia',
+  mediaAprovacao: 'mediaAprovacao',
+  limiteFaltas: 'limiteFaltas',
   usuarioId: 'usuarioId',
   criadoEm: 'criadoEm'
 } as const
@@ -796,12 +874,27 @@ export const EventoScalarFieldEnum = {
   data: 'data',
   peso: 'peso',
   status: 'status',
+  nota: 'nota',
+  notaMaxima: 'notaMaxima',
   disciplinaId: 'disciplinaId',
   criadoEm: 'criadoEm',
   atualizadoEm: 'atualizadoEm'
 } as const
 
 export type EventoScalarFieldEnum = (typeof EventoScalarFieldEnum)[keyof typeof EventoScalarFieldEnum]
+
+
+export const RegistroFrequenciaScalarFieldEnum = {
+  id: 'id',
+  data: 'data',
+  quantidadeAulas: 'quantidadeAulas',
+  faltas: 'faltas',
+  disciplinaId: 'disciplinaId',
+  criadoEm: 'criadoEm',
+  atualizadoEm: 'atualizadoEm'
+} as const
+
+export type RegistroFrequenciaScalarFieldEnum = (typeof RegistroFrequenciaScalarFieldEnum)[keyof typeof RegistroFrequenciaScalarFieldEnum]
 
 
 export const LogAuditoriaScalarFieldEnum = {
@@ -891,16 +984,16 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'TipoEvento'
+ * Reference to a field of type 'RegraMedia'
  */
-export type EnumTipoEventoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoEvento'>
+export type EnumRegraMediaFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RegraMedia'>
     
 
 
 /**
- * Reference to a field of type 'TipoEvento[]'
+ * Reference to a field of type 'RegraMedia[]'
  */
-export type ListEnumTipoEventoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoEvento[]'>
+export type ListEnumRegraMediaFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RegraMedia[]'>
     
 
 
@@ -915,6 +1008,20 @@ export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
  * Reference to a field of type 'Decimal[]'
  */
 export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TipoEvento'
+ */
+export type EnumTipoEventoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoEvento'>
+    
+
+
+/**
+ * Reference to a field of type 'TipoEvento[]'
+ */
+export type ListEnumTipoEventoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoEvento[]'>
     
 
 
@@ -1099,6 +1206,7 @@ export type GlobalOmitConfig = {
   usuario?: Prisma.UsuarioOmit
   disciplina?: Prisma.DisciplinaOmit
   evento?: Prisma.EventoOmit
+  registroFrequencia?: Prisma.RegistroFrequenciaOmit
   logAuditoria?: Prisma.LogAuditoriaOmit
 }
 

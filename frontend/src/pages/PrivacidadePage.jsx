@@ -117,8 +117,9 @@ export default function PrivacidadePage() {
                 </dd>
                 <dt>Dados acadêmicos</dt>
                 <dd>
-                  {dados.dadosAcademicos.disciplinas} disciplina(s) e{" "}
-                  {dados.dadosAcademicos.eventos} evento(s)
+                  {dados.dadosAcademicos.disciplinas} disciplina(s), {dados.dadosAcademicos.eventos}{" "}
+                  evento(s), {dados.dadosAcademicos.notasLancadas} nota(s) lançada(s) e{" "}
+                  {dados.dadosAcademicos.registrosFrequencia} registro(s) de frequência
                 </dd>
                 <dt>Finalidade</dt>
                 <dd>{dados.finalidade}</dd>

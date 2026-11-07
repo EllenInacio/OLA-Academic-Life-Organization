@@ -29,6 +29,8 @@ export function criar(dados: DadosEvento) {
       peso: dados.peso,
       status: dados.status,
       disciplinaId: dados.disciplinaId,
+      nota: dados.nota ?? null,
+      notaMaxima: dados.notaMaxima,
     },
     include: COM_DISCIPLINA,
   });
@@ -51,4 +53,20 @@ export function atualizar(id: number, dados: DadosEvento) {
 
 export function remover(id: number) {
   return prisma.evento.delete({ where: { id } });
+}
+
+export function lancarNota(id: number, nota: number, notaMaxima: number) {
+  return prisma.evento.update({
+    where: { id },
+    data: { nota, notaMaxima, status: "CONCLUIDO" },
+    include: COM_DISCIPLINA,
+  });
+}
+
+export function removerNota(id: number) {
+  return prisma.evento.update({
+    where: { id },
+    data: { nota: null },
+    include: COM_DISCIPLINA,
+  });
 }

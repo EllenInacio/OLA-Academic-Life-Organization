@@ -11,4 +11,14 @@ export type DadosEvento = {
   peso: number;
   status?: StatusEvento;
   disciplinaId: number;
+  nota?: number | null;
+  notaMaxima?: number;
+};
+
+export const NOTA_MAXIMA_PADRAO = 10;
+export const LIMITE_NOTA = 100;
+
+export type DadosNota = {
+  nota: number;
+  notaMaxima?: number;
 };

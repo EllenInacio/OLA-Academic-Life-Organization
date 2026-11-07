@@ -1,0 +1,65 @@
+seletor-horario-titulo {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.seletor-dias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.seletor-dia {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  color: var(--cinza);
+  cursor: pointer;
+}
+
+.seletor-dia:hover {
+  border-color: var(--lilas);
+}
+
+.seletor-dia-ativo {
+  background: var(--lilas);
+  border-color: var(--lilas);
+  color: var(--branco);
+}
+
+.seletor-horarios {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.seletor-horarios li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.seletor-horario-dia {
+  min-width: 34px;
+  font-weight: 600;
+}
+
+.seletor-horario .seletor-hora {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.seletor-horario .seletor-hora select {
+  width: auto;
+  padding: 6px 8px;
+}

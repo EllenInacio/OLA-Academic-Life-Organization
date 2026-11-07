@@ -100,10 +100,22 @@
 }
 
 .gestao-form {
-  position: sticky;
-  top: 20px;
   border-radius: 14px;
   scroll-margin-top: 20px;
+}
+
+.gestao-criterios {
+  border: none;
+  border-top: 1px solid var(--borda);
+  padding-top: 12px;
+  margin: 4px 0 8px;
+}
+
+.gestao-criterios legend {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lilas-escuro);
+  padding-right: 8px;
 }
 
 .gestao-dica {
@@ -125,6 +137,28 @@
   text-decoration: underline;
 }
 
+.detalhe-destaque {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 10px 0 6px;
+}
+
+.detalhe-destaque > strong {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1;
+  min-width: 72px;
+}
+
+.detalhe-destaque .painel-nota {
+  margin: 4px 0 0;
+}
+
+.texto-critico-inline {
+  color: var(--erro);
+}
+
 .detalhe-eventos {
   display: flex;
   flex-direction: column;
@@ -136,9 +170,6 @@
     grid-template-columns: 1fr;
   }
 
-  .gestao-form {
-    position: static;
-  }
 }
 
 @media (max-width: 520px) {

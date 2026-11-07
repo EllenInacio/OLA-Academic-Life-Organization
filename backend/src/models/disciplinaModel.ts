@@ -1,8 +1,9 @@
 import { prisma } from "../config/prisma";
 import { DadosDisciplina } from "../types/disciplina";
 
-const COM_TOTAL_EVENTOS = {
-  _count: { select: { eventos: true } },
+const COM_DADOS_ACADEMICOS = {
+  eventos: { orderBy: [{ data: "asc" as const }, { id: "asc" as const }] },
+  frequencias: { orderBy: { data: "desc" as const } },
 };
 
 function camposDisciplina(dados: DadosDisciplina) {
@@ -12,45 +13,50 @@ function camposDisciplina(dados: DadosDisciplina) {
     semestre: dados.semestre || null,
     cargaHoraria: dados.cargaHoraria ?? null,
     horario: dados.horario || null,
+    regraMedia: dados.regraMedia ?? undefined,
+    mediaAprovacao: dados.mediaAprovacao === undefined ? undefined : dados.mediaAprovacao,
+    limiteFaltas: dados.limiteFaltas ?? undefined,
   };
 }
 
-export function listar(usuarioId: number) {
-  return prisma.disciplina.findMany({
-    where: { usuarioId },
-    orderBy: { nome: "asc" },
-    include: COM_TOTAL_EVENTOS,
-  });
-}
-
 export function buscarPorId(usuarioId: number, id: number) {
-  return prisma.disciplina.findFirst({ where: { id, usuarioId } });
+  return prisma.disciplina.findFirst(
+    { where: { id, usuarioId } }
+  );
 }
 
 export function buscarComEventos(usuarioId: number, id: number) {
   return prisma.disciplina.findFirst({
     where: { id, usuarioId },
-    include: { eventos: { orderBy: [{ data: "asc" }, { id: "asc" }] } },
+    include: COM_DADOS_ACADEMICOS,
   });
 }
 
-// Mesma consulta de eventos usada pelo calendário, agrupada por disciplina (Dashboard).
 export function listarComEventos(usuarioId: number) {
   return prisma.disciplina.findMany({
     where: { usuarioId },
     orderBy: { nome: "asc" },
-    include: { eventos: { orderBy: [{ data: "asc" }, { id: "asc" }] } },
+    include: COM_DADOS_ACADEMICOS,
   });
 }
 
 export function buscarPorNome(usuarioId: number, nome: string) {
   return prisma.disciplina.findUnique({
-    where: { usuarioId_nome: { usuarioId, nome } },
+    where: { usuarioId_nome:
+       { usuarioId, nome } },
   });
 }
 
-export function contarEventos(id: number) {
-  return prisma.evento.count({ where: { disciplinaId: id } });
+export async function contarRelacionados(id: number) {
+  const [eventos, frequencias] = await Promise.all([
+    prisma.evento.count(
+      { where: { disciplinaId: id } }
+    ),
+    prisma.registroFrequencia.count(
+      { where: { disciplinaId: id } }
+    ),
+  ]);
+  return { eventos, frequencias };
 }
 
 export function criar(usuarioId: number, dados: DadosDisciplina) {
@@ -66,7 +72,8 @@ export function atualizar(id: number, dados: DadosDisciplina) {
   });
 }
 
-// Os eventos vinculados são removidos pelo ON DELETE CASCADE do banco.
 export function remover(id: number) {
-  return prisma.disciplina.delete({ where: { id } });
+  return prisma.disciplina.delete(
+    { where: { id } }
+  );
 }

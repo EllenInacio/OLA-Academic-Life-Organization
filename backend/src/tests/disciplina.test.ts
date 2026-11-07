@@ -108,6 +108,75 @@ describe("Disciplinas", () => {
     });
   });
 
+  it("usa critérios padrão (média ponderada, sem média de aprovação, 25% de faltas)", async () => {
+    const resposta = await request(app).post("/api/disciplinas").set(autorizacao).send({ nome: "Redes" });
+
+    expect(resposta.body).toMatchObject({ regraMedia: "PONDERADA", mediaAprovacao: null });
+    expect(Number(resposta.body.limiteFaltas)).toBe(25);
+  });
+
+  it("salva e mantém os critérios de avaliação", async () => {
+    const criada = await request(app).post("/api/disciplinas").set(autorizacao).send({
+      nome: "Cálculo I",
+      regraMedia: "ARITMETICA",
+      mediaAprovacao: 6,
+      limiteFaltas: 20,
+    });
+
+    // Edição sem os critérios (ex.: cadastro rápido) mantém os valores salvos.
+    const editada = await request(app)
+      .put(`/api/disciplinas/${criada.body.id}`)
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", professor: "Helena" });
+
+    expect(editada.body.regraMedia).toBe("ARITMETICA");
+    expect(Number(editada.body.mediaAprovacao)).toBe(6);
+    expect(Number(editada.body.limiteFaltas)).toBe(20);
+
+    // null remove a média de aprovação.
+    const semMedia = await request(app)
+      .put(`/api/disciplinas/${criada.body.id}`)
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", mediaAprovacao: null });
+    expect(semMedia.body.mediaAprovacao).toBeNull();
+  });
+
+  it.each([
+    [{ regraMedia: "MEDIANA" }, "Regra da média"],
+    [{ mediaAprovacao: 11 }, "média de aprovação"],
+    [{ limiteFaltas: 0 }, "limite de faltas"],
+    [{ limiteFaltas: 120 }, "limite de faltas"],
+  ])("recusa critério inválido %p", async (criterio, trecho) => {
+    const resposta = await request(app)
+      .post("/api/disciplinas")
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", ...criterio });
+
+    expect(resposta.status).toBe(400);
+    expect(resposta.body.erro).toContain(trecho);
+  });
+
+  it("informa média e frequência de cada disciplina na listagem", async () => {
+    const id = await criarDisciplina("Banco de Dados");
+    await criarEvento(id, { titulo: "Prova 1", data: dataRelativa(-3) });
+    const eventos = await prisma.evento.findMany();
+    await request(app).put(`/api/eventos/${eventos[0].id}/nota`).set(autorizacao).send({ nota: 7.5 });
+    await request(app)
+      .post(`/api/disciplinas/${id}/frequencias`)
+      .set(autorizacao)
+      .send({ data: dataRelativa(-3), quantidadeAulas: 4, faltas: 1 });
+
+    const resposta = await request(app).get("/api/disciplinas").set(autorizacao);
+
+    expect(resposta.body[0]).toMatchObject({
+      nome: "Banco de Dados",
+      media: 7.5,
+      situacaoNota: "SEM_CRITERIO",
+      percentualFaltas: 25,
+      situacaoFrequencia: "PERTO_DO_LIMITE",
+    });
+  });
+
   it("recusa semestre fora do formato AAAA.N", async () => {
     const resposta = await request(app)
       .post("/api/disciplinas")
@@ -222,7 +291,7 @@ describe("Disciplinas", () => {
     const resposta = await request(app).delete(`/api/disciplinas/${id}`).set(autorizacao);
 
     expect(resposta.status).toBe(409);
-    expect(resposta.body.detalhes).toEqual({ eventos: 1 });
+    expect(resposta.body.detalhes).toEqual({ eventos: 1, frequencias: 0 });
     expect(await prisma.disciplina.count()).toBe(1);
     expect(await prisma.evento.count()).toBe(1);
   });
@@ -255,7 +324,10 @@ describe("Disciplinas", () => {
     expect(logs.map((log) => [log.acao, log.detalhe])).toEqual([
       ["DISCIPLINA_CRIADA", "Redes"],
       ["DISCIPLINA_ALTERADA", "Redes II"],
-      ["DISCIPLINA_EXCLUIDA", "Redes II (1 evento(s) removido(s) junto)"],
+      [
+        "DISCIPLINA_EXCLUIDA",
+        "Redes II (removidos junto: 1 evento(s), 0 registro(s) de frequência)",
+      ],
     ]);
   });
 });

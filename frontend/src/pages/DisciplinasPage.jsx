@@ -7,7 +7,8 @@ import Pagina from "../components/Pagina";
 import { useDisciplinas } from "../hooks/useDisciplinas";
 import { mensagemDeErro } from "../services/api";
 import { excluirDisciplinaComConfirmacao } from "../utils/excluirDisciplina";
-import { plural } from "../utils/formatacao";
+import { formatarNumero, formatarPercentual, plural } from "../utils/formatacao";
+import { SITUACAO_FREQUENCIA, SITUACAO_NOTA } from "../constants/desempenho";
 import "./DisciplinasPage.css";
 
 function infoComplementar(disciplina) {
@@ -33,6 +34,22 @@ function DisciplinaCard({ disciplina, emEdicao, aoEditar, aoExcluir }) {
         <div className="disciplina-card-tags">
           {disciplina.semestre && <span className="tag">{disciplina.semestre}</span>}
           <span className="tag tag-peso">{plural(disciplina.totalEventos, "evento", "eventos")}</span>
+          {disciplina.media !== null && (
+            <span
+              className={`selo selo-${SITUACAO_NOTA[disciplina.situacaoNota]?.classe ?? "neutra"}`}
+              title={SITUACAO_NOTA[disciplina.situacaoNota]?.rotulo}
+            >
+              Média {formatarNumero(disciplina.media)}
+            </span>
+          )}
+          {disciplina.percentualFaltas !== null && (
+            <span
+              className={`selo selo-${SITUACAO_FREQUENCIA[disciplina.situacaoFrequencia]?.classe ?? "neutra"}`}
+              title={SITUACAO_FREQUENCIA[disciplina.situacaoFrequencia]?.rotulo}
+            >
+              {formatarPercentual(disciplina.percentualFaltas)} faltas
+            </span>
+          )}
         </div>
       </div>
 
@@ -112,7 +129,7 @@ export default function DisciplinasPage() {
       const excluiu = await excluirDisciplinaComConfirmacao(
         disciplina,
         removerDisciplina,
-        disciplina.totalEventos
+        { eventos: disciplina.totalEventos, frequencias: disciplina.totalFrequencias }
       );
       if (!excluiu) return;
 

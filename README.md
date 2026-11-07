@@ -7,11 +7,15 @@ Mogi das Cruzes (UMC).
 Funcionalidades implementadas:
 
 - **Dashboard acadêmico**: resumo calculado a partir dos dados reais do usuário —
-  disciplinas cadastradas, atividades pendentes e concluídas, próximas provas e
-  trabalhos, pontos de atenção (prazos próximos e prazos vencidos sem conclusão) e
-  gráfico do andamento por disciplina.
+  disciplinas, média geral, atividades pendentes e concluídas, próximas provas e
+  trabalhos, média e frequência por disciplina, disciplinas em atenção, pontos de
+  atenção (prazos, média, frequência e notas pendentes) e andamento por disciplina.
 - **Gestão de disciplinas**: cadastro, consulta, detalhes, edição e exclusão protegida
-  (nome, professor, semestre, carga horária e horário).
+  (nome, professor, semestre, carga horária, horário e critérios de avaliação).
+- **Notas e frequência**: lançamento de notas por avaliação com cálculo automático da
+  média (ponderada ou aritmética, configurável por disciplina), nota necessária para
+  atingir a média, registro de presença e falta por dia de aula, percentual de faltas e
+  quantas faltas ainda são permitidas.
 - **Calendário de provas e trabalhos**: cadastro, edição, exclusão e visualização
   de eventos acadêmicos vinculados a disciplinas.
 - **Autenticação**: cadastro, login com senha e verificação em duas etapas
@@ -50,7 +54,7 @@ OLA/
 │   │   ├── schema.prisma        modelo de dados
 │   │   └── seed.ts              usuário e dados de teste
 │   ├── src/
-│   │   ├── calculos/            regras de cálculo puras (prazos e indicadores do dashboard)
+│   │   ├── calculos/            regras de cálculo puras (prazos, média, frequência e dashboard)
 │   │   ├── config/              conexão com o banco e variáveis de segurança
 │   │   ├── controllers/         recebem a requisição e devolvem a resposta
 │   │   ├── errors/              erro de negócio com código HTTP
@@ -77,7 +81,7 @@ OLA/
 │   │   ├── contexts/            sessão do usuário
 │   │   ├── hooks/               estado e comunicação com a API
 │   │   ├── pages/               login, cadastro, 2FA, senha, dashboard, calendário,
-│   │   │                        disciplinas e privacidade
+│   │   │                        notas e frequência, disciplinas e privacidade
 │   │   ├── services/            chamadas HTTP
 │   │   ├── styles/              identidade visual do OLA
 │   │   └── utils/               formatação pt-BR e confirmação de exclusão
@@ -91,8 +95,10 @@ OLA/
 
 ## Modelo de dados
 
-Um usuário possui várias disciplinas, e uma disciplina possui vários eventos.
-Os registros de auditoria referenciam o usuário que realizou a ação.
+Um usuário possui várias disciplinas. Uma disciplina possui vários eventos (provas,
+trabalhos e entregas — os eventos com peso maior que zero são as avaliações, que
+recebem nota) e vários registros de frequência. Os registros de auditoria referenciam
+o usuário que realizou a ação.
 
 **usuario**
 
@@ -120,6 +126,9 @@ Os registros de auditoria referenciam o usuário que realizou a ação.
 | semestre | VARCHAR(10) | opcional, formato AAAA.N (ex.: 2026.2) |
 | carga_horaria | INTEGER | opcional, em horas (1 a 1000) |
 | horario | VARCHAR(120) | opcional, texto livre (ex.: Seg e Qua · 08:00–09:40) |
+| regra_media | ENUM | PONDERADA (padrão) ou ARITMETICA |
+| media_aprovacao | DECIMAL(4,2) | opcional, escala 0–10; sem ela, a situação não é exibida |
+| limite_faltas | DECIMAL(5,2) | percentual, padrão 25 |
 | usuario_id | INTEGER | chave estrangeira → usuario.id |
 | criado_em | TIMESTAMP | preenchido automaticamente |
 
@@ -133,9 +142,22 @@ Os registros de auditoria referenciam o usuário que realizou a ação.
 | data | DATE | obrigatório |
 | peso | DECIMAL(5,2) | obrigatório |
 | status | ENUM | PENDENTE, EM_ANDAMENTO ou CONCLUIDO |
+| nota | DECIMAL(5,2) | opcional; lançar a nota marca o evento como CONCLUIDO |
+| nota_maxima | DECIMAL(5,2) | padrão 10 |
 | disciplina_id | INTEGER | chave estrangeira → disciplina.id |
 | criado_em | TIMESTAMP | preenchido automaticamente |
 | atualizado_em | TIMESTAMP | atualizado automaticamente |
+
+**registro_frequencia**
+
+| Campo | Tipo | Observação |
+|---|---|---|
+| id | SERIAL | chave primária |
+| data | DATE | data da aula; único por disciplina; não aceita data futura |
+| quantidade_aulas | INTEGER | aulas naquele dia (padrão 1) |
+| faltas | INTEGER | de 0 até quantidade_aulas |
+| disciplina_id | INTEGER | chave estrangeira → disciplina.id (`ON DELETE CASCADE`) |
+| criado_em / atualizado_em | TIMESTAMP | preenchidos automaticamente |
 
 **log_auditoria**
 
@@ -152,10 +174,10 @@ Os registros de auditoria referenciam o usuário que realizou a ação.
 Excluir um usuário exclui suas disciplinas e eventos (`ON DELETE CASCADE`). Os
 registros de auditoria são apenas inseridos e consultados pela aplicação.
 
-Excluir uma disciplina que tem eventos no calendário exige confirmação explícita:
-sem `?confirmar=true`, a API responde `409` com a quantidade de eventos vinculados
-(`{ "erro": "...", "detalhes": { "eventos": 3 } }`) e nada é apagado. Com a
-confirmação, a disciplina e os eventos dela são excluídos.
+Excluir uma disciplina que tem eventos ou registros de frequência exige confirmação
+explícita: sem `?confirmar=true`, a API responde `409` com a quantidade de dados
+vinculados (`{ "erro": "...", "detalhes": { "eventos": 3, "frequencias": 10 } }`) e nada
+é apagado. Com a confirmação, a disciplina e os dados dela são excluídos.
 
 ## Pré-requisitos
 
@@ -271,10 +293,16 @@ Base: `http://localhost:3333/api`
 | POST | `/auth/logout` | Encerra a sessão |
 | GET | `/dashboard` | Indicadores do painel (ver "Regras de cálculo do Dashboard") |
 | GET | `/disciplinas` | Lista as disciplinas do usuário em ordem alfabética, com `totalEventos` |
-| GET | `/disciplinas/:id` | Detalhes: dados, eventos (com `diasRestantes`) e resumo |
+| GET | `/disciplinas/:id` | Detalhes: dados, eventos (com `diasRestantes`) e resumo (desempenho e frequência) |
 | POST | `/disciplinas` | Cadastra uma disciplina |
-| PUT | `/disciplinas/:id` | Edita uma disciplina |
-| DELETE | `/disciplinas/:id` | Exclui; com eventos vinculados exige `?confirmar=true` |
+| PUT | `/disciplinas/:id` | Edita uma disciplina (critérios não enviados são mantidos) |
+| DELETE | `/disciplinas/:id` | Exclui; com eventos ou frequência exige `?confirmar=true` |
+| GET | `/disciplinas/:id/frequencias` | Lista os registros de frequência (mais recente primeiro) |
+| POST | `/disciplinas/:id/frequencias` | Registra uma aula: `{ data, quantidadeAulas, faltas }` |
+| PUT | `/frequencias/:id` | Edita um registro de frequência |
+| DELETE | `/frequencias/:id` | Exclui um registro de frequência |
+| PUT | `/eventos/:id/nota` | Lança ou altera a nota: `{ nota, notaMaxima? }` |
+| DELETE | `/eventos/:id/nota` | Remove a nota (a avaliação continua no calendário) |
 | GET | `/eventos` | Lista os eventos do usuário ordenados por data |
 | GET | `/eventos/:id` | Busca um evento |
 | POST | `/eventos` | Cadastra um evento |
@@ -307,9 +335,15 @@ Exemplo de corpo para criar ou editar uma disciplina (só `nome` é obrigatório
   "professor": "Helena Duarte",
   "semestre": "2026.2",
   "cargaHoraria": 72,
-  "horario": "Seg e Qua · 08:00–09:40"
+  "horario": "Seg e Qua · 08:00–09:40",
+  "regraMedia": "PONDERADA",
+  "mediaAprovacao": 6,
+  "limiteFaltas": 25
 }
 ```
+
+O `POST /eventos` também aceita `nota` e `notaMaxima` opcionais, para cadastrar uma
+avaliação que já tem nota (ela é salva como concluída).
 
 Erros são devolvidos no formato `{ "erro": "mensagem" }`.
 
@@ -330,10 +364,43 @@ banco, o que permite testá-las isoladamente (`calculos.test.ts`).
 | Prazo próximo | Evento não concluído que vence em até 7 dias; nível alto (Urgente) em até 2 dias |
 | Prazo vencido | Evento cuja data já passou e que continua `PENDENTE` ou `EM_ANDAMENTO` |
 | Andamento por disciplina | Quantidade de eventos concluídos, em andamento e pendentes de cada disciplina |
+| Média geral | Média aritmética das médias (parciais) das disciplinas que já têm nota |
+| Disciplinas em atenção | Disciplinas com alerta de média ou de frequência |
+| Nota pendente | Avaliação concluída, com data passada, ainda sem nota |
 
-Quando não há disciplinas ou eventos cadastrados, a tela mostra uma orientação em
-vez de números. Média e frequência entram no Dashboard junto com o controle de notas
-e frequência (próxima etapa).
+### Média da disciplina (`calculos/notas.ts`)
+
+- Avaliação = evento com peso maior que zero. Eventos com peso 0 não entram na média.
+- Cada nota é convertida para a escala 0–10: `nota ÷ nota máxima × 10`.
+- **Ponderada**: `Σ(nota × peso) ÷ Σ(peso)`. **Aritmética**: `Σ(nota) ÷ quantidade`.
+- Só entram as avaliações com nota lançada; enquanto faltar alguma, a média é **parcial**.
+- **Situação**: só é exibida quando a disciplina tem média de aprovação. Parcial acima/
+  abaixo da média enquanto houver avaliação sem nota; "atingiu a média" ou "abaixo da
+  média" quando todas têm nota.
+- **Nota necessária**: média que falta tirar nas avaliações sem nota para chegar à média
+  de aprovação: `(média de aprovação × peso total − Σ(nota × peso)) ÷ peso restante`
+  (na aritmética, cada avaliação tem peso 1). Se passar de 10, a média não é mais
+  alcançável com as avaliações cadastradas.
+
+Exemplo (protótipo): Prova 1 = 6,5 (peso 3), Lista = 8,0 (peso 1), Prova 2 sem nota
+(peso 3) → média parcial `(6,5×3 + 8×1) ÷ 4 = 6,88`; com média de aprovação 6, a nota
+necessária na Prova 2 é `(6×7 − 27,5) ÷ 3 = 4,83`.
+
+### Frequência da disciplina (`calculos/frequencia.ts`)
+
+- Os dados vêm dos registros feitos pelo próprio aluno: um registro por dia de aula, com
+  a quantidade de aulas e de faltas. O sistema não cria registros por conta própria.
+- **Percentual de faltas (parcial)** = `faltas ÷ aulas registradas × 100`. Sem registros,
+  nenhum percentual é exibido.
+- **Aulas previstas** = carga horária × 1 (cada hora de carga horária conta como uma aula;
+  constante `AULAS_POR_HORA`).
+- **Faltas permitidas** = arredondamento para baixo de `aulas previstas × limite %`
+  (ex.: 72h com limite de 25% → 18 faltas).
+- **Situação**: com carga horária, compara as faltas com as permitidas — "perto do limite"
+  a partir de 75% delas, "limite ultrapassado" acima. Sem carga horária, usa o percentual
+  parcial e é indicada como parcial.
+- Avisos extras: ritmo atual de faltas acima do limite (estimativa) e mais aulas
+  registradas do que a carga horária prevê.
 
 ## Segurança e LGPD
 
@@ -344,13 +411,14 @@ e frequência (próxima etapa).
   invalidam os tokens já emitidos.
 - Limite de tentativas por IP em login, verificação, recuperação e rotas LGPD.
 - Cabeçalhos de segurança HTTP com Helmet e corpo das requisições limitado a 10 KB.
-- Termos de Uso e Política de Privacidade exibidos no cadastro e na página
+- Termos de Uso e Política de Privacidade (versão 1.0) exibidos no cadastro e na página
   **Privacidade e dados**, que reúne os direitos do titular (art. 18 da LGPD).
 
 Ações registradas na auditoria: cadastro, tentativas de login, validação da senha,
 falhas e sucesso da verificação em duas etapas, logout, etapas da recuperação de senha,
 consulta e exportação de dados, revogação do consentimento, exclusão da conta, cadastro,
-alteração e exclusão de disciplinas e cadastro, alteração e exclusão de eventos.
+alteração e exclusão de disciplinas, cadastro, alteração e exclusão de eventos,
+lançamento e remoção de notas, registro, alteração e exclusão de frequência.
 
 A documentação das integrações externas está em
 [`docs/integracao-api-externa.md`](docs/integracao-api-externa.md).
@@ -374,17 +442,15 @@ Relatório de cobertura: `npm run test:coverage`.
 - Front-end (Vercel): definir `VITE_API_URL` com o endereço público da API. O
   `vercel.json` redireciona as rotas do React para o `index.html`.
 - Back-end (Render): definir `DATABASE_URL`, `CORS_ORIGIN` (endereço do front-end),
-  `JWT_SECRET`, `ENCRYPTION_KEY`, `GMAIL_USER`, `GMAIL_APP_PASSWORD` e
-  `NODE_ENV=production`, e executar `npx prisma migrate deploy` antes de iniciar.
+  `JWT_SECRET`, `ENCRYPTION_KEY`, `GMAIL_USER`, `GMAIL_APP_PASSWORD`,
+  `NODE_ENV=production`, e executar
+  `npx prisma migrate deploy` antes de iniciar.
 
 ## Escopo desta entrega
 
-Implementado: dashboard acadêmico, gestão completa de disciplinas (com exclusão
-protegida), CRUD completo de eventos acadêmicos, ordenação por data, autenticação com
-verificação em duas etapas, recuperação de senha, controle de acesso por usuário,
-auditoria, funcionalidades da LGPD, validação de campos e mensagens de erro e sucesso.
-A área logada usa menu lateral (Dashboard em `/`, Calendário em `/calendario`,
-Disciplinas em `/disciplinas`).
-
-Previsto para as próximas etapas: controle de notas e frequência (com média e
-frequência no dashboard) e assistente de preenchimento por chat.
+Implementado: dashboard acadêmico, gestão completa de disciplinas (com critérios de
+avaliação e exclusão protegida), controle de notas e frequência, CRUD completo de
+eventos acadêmicos, ordenação por data, autenticação com verificação em duas etapas, recuperação de senha, controle de acesso
+por usuário, auditoria, funcionalidades da LGPD, validação de campos e mensagens de erro
+e sucesso. A área logada usa menu lateral (Dashboard em `/`, Calendário em
+`/calendario`, Notas e frequência em `/notas-frequencia` e Disciplinas em `/disciplinas`).

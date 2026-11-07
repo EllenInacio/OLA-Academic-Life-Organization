@@ -1,7 +1,8 @@
 import { AppError } from "../errors/AppError";
 import * as eventoModel from "../models/eventoModel";
 import * as disciplinaModel from "../models/disciplinaModel";
-import { DadosEvento } from "../types/evento";
+import { DadosEvento, DadosNota, NOTA_MAXIMA_PADRAO } from "../types/evento";
+import { formatarNumero } from "../utils/formatacao";
 
 export function listar(usuarioId: number) {
   return eventoModel.listar(usuarioId);
@@ -25,8 +26,24 @@ async function garantirDisciplina(usuarioId: number, disciplinaId: number) {
   }
 }
 
+function garantirAvaliativo(peso: number) {
+  if (peso <= 0) {
+    throw new AppError(
+      "Este evento tem peso 0, então não é avaliativo. Altere o peso no calendário para lançar a nota.",
+      400
+    );
+  }
+}
+
 export async function criar(usuarioId: number, dados: DadosEvento) {
   await garantirDisciplina(usuarioId, dados.disciplinaId);
+
+  if (dados.nota !== undefined && dados.nota !== null) {
+    garantirAvaliativo(dados.peso);
+    // Avaliação cadastrada já com nota: está concluída.
+    return eventoModel.criar({ ...dados, status: "CONCLUIDO" });
+  }
+
   return eventoModel.criar(dados);
 }
 
@@ -34,6 +51,27 @@ export async function atualizar(usuarioId: number, id: number, dados: DadosEvent
   await buscarPorId(usuarioId, id);
   await garantirDisciplina(usuarioId, dados.disciplinaId);
   return eventoModel.atualizar(id, dados);
+}
+
+export async function lancarNota(usuarioId: number, id: number, dados: DadosNota) {
+  const evento = await buscarPorId(usuarioId, id);
+  garantirAvaliativo(Number(evento.peso));
+
+  const notaMaxima = dados.notaMaxima ?? Number(evento.notaMaxima ?? NOTA_MAXIMA_PADRAO);
+
+  if (dados.nota > notaMaxima) {
+    throw new AppError(
+      `A nota não pode ser maior que a nota máxima da avaliação (${formatarNumero(notaMaxima)}).`,
+      400
+    );
+  }
+
+  return eventoModel.lancarNota(id, dados.nota, notaMaxima);
+}
+
+export async function removerNota(usuarioId: number, id: number) {
+  await buscarPorId(usuarioId, id);
+  return eventoModel.removerNota(id);
 }
 
 export async function remover(usuarioId: number, id: number) {

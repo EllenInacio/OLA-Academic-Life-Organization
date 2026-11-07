@@ -47,7 +47,7 @@ export async function atualizar(req: Request, res: Response) {
 }
 
 export async function remover(req: Request, res: Response) {
-  const { disciplina, eventosRemovidos } = await disciplinaService.remover(
+  const { disciplina, removidos } = await disciplinaService.remover(
     req.usuarioId!,
     Number(req.params.id),
     req.query.confirmar === "true"
@@ -56,7 +56,7 @@ export async function remover(req: Request, res: Response) {
     req,
     "DISCIPLINA_EXCLUIDA",
     disciplina,
-    `${disciplina.nome} (${eventosRemovidos} evento(s) removido(s) junto)`
+    `${disciplina.nome} (removidos junto: ${removidos.eventos} evento(s), ${removidos.frequencias} registro(s) de frequência)`
   );
   res.status(204).send();
 }

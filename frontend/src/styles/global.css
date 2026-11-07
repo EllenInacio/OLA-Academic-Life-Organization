@@ -394,3 +394,57 @@ a.botao-secundario {
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
+
+/* Selos de situação (sempre com texto) */
+.selo {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.selo-neutra {
+  background: #f1f0f3;
+  color: var(--cinza);
+}
+
+.selo-boa {
+  background: var(--sucesso-fundo);
+  color: var(--sucesso);
+}
+
+.selo-atencao {
+  background: #fff3df;
+  color: #8a5a08;
+}
+
+.selo-critica {
+  background: var(--erro-fundo);
+  color: var(--erro);
+}
+
+/* Barra de uso do limite de faltas (Dashboard e Notas e frequência) */
+.barra-frequencia {
+  height: 10px;
+  border-radius: 4px;
+  background: #e6e3ec;
+  overflow: hidden;
+  margin: 4px 0 6px;
+}
+
+.barra-frequencia-uso {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--lilas);
+}
+
+.barra-frequencia-uso.barra-atencao {
+  background: #d08a17;
+}
+
+.barra-frequencia-uso.barra-critica {
+  background: var(--erro);
+}

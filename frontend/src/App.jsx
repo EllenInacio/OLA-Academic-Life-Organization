@@ -8,6 +8,7 @@ import CadastroPage from "./pages/CadastroPage";
 import DashboardPage from "./pages/DashboardPage";
 import DisciplinaDetalhePage from "./pages/DisciplinaDetalhePage";
 import DisciplinasPage from "./pages/DisciplinasPage";
+import NotasFrequenciaPage from "./pages/NotasFrequenciaPage";
 import LoginPage from "./pages/LoginPage";
 import PrivacidadePage from "./pages/PrivacidadePage";
 import RedefinirSenhaPage from "./pages/RedefinirSenhaPage";
@@ -29,6 +30,7 @@ export default function App() {
             <Route element={<AreaLogada />}>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/calendario" element={<CalendarioPage />} />
+              <Route path="/notas-frequencia" element={<NotasFrequenciaPage />} />
               <Route path="/disciplinas" element={<DisciplinasPage />} />
               <Route path="/disciplinas/:id" element={<DisciplinaDetalhePage />} />
               <Route path="/privacidade" element={<PrivacidadePage />} />

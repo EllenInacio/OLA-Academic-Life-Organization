@@ -1,17 +1,13 @@
-// Formatação de datas e números no padrão pt-BR.
-
 function dataUTC(isoData) {
   const [ano, mes, dia] = String(isoData).slice(0, 10).split("-").map(Number);
   return new Date(Date.UTC(ano, mes - 1, dia));
 }
 
-/** "2026-10-15" -> "15/10/2026" */
 export function formatarData(isoData) {
   const [ano, mes, dia] = String(isoData).slice(0, 10).split("-");
   return `${dia}/${mes}/${ano}`;
 }
 
-/** "2026-10-13" -> "terça-feira, 13 de outubro de 2026" */
 export function formatarDataExtensa(isoData) {
   return new Intl.DateTimeFormat("pt-BR", {
     weekday: "long",
@@ -22,7 +18,6 @@ export function formatarDataExtensa(isoData) {
   }).format(dataUTC(isoData));
 }
 
-/** Dias restantes até o evento em texto: hoje, amanhã, em 3 dias, ontem, há 2 dias. */
 export function textoPrazo(dias) {
   if (dias === 0) return "hoje";
   if (dias === 1) return "amanhã";
@@ -30,14 +25,29 @@ export function textoPrazo(dias) {
   return dias > 0 ? `em ${dias} dias` : `há ${Math.abs(dias)} dias`;
 }
 
-export function formatarNumero(valor, casas = 1) {
+export function formatarNumero(valor, casas = 2) {
   return Number(valor).toLocaleString("pt-BR", {
     minimumFractionDigits: 0,
     maximumFractionDigits: casas,
   });
 }
 
-/** Plural simples: plural(2, "evento", "eventos") -> "2 eventos" */
 export function plural(quantidade, singular, pluralTexto) {
   return `${quantidade} ${quantidade === 1 ? singular : pluralTexto}`;
+}
+
+export function formatarPercentual(valor) {
+  return `${formatarNumero(valor, 1)}%`;
+}
+
+export function lerNumero(texto) {
+  const limpo = String(texto ?? "").trim().replace(",", ".");
+  return limpo === "" ? NaN : Number(limpo);
+}
+
+export function hojeISO() {
+  const agora = new Date();
+  const mes = String(agora.getMonth() + 1).padStart(2, "0");
+  const dia = String(agora.getDate()).padStart(2, "0");
+  return `${agora.getFullYear()}-${mes}-${dia}`;
 }

@@ -20,6 +20,11 @@ enum StatusEvento {
   CONCLUIDO
 }
 
+enum RegraMedia {
+  PONDERADA
+  ARITMETICA
+}
+
 model Usuario {
   id                        Int       @id @default(autoincrement())
   nome                      String    @db.VarChar(120)
@@ -43,17 +48,22 @@ model Usuario {
 }
 
 model Disciplina {
-  id           Int      @id @default(autoincrement())
-  nome         String   @db.VarChar(120)
-  professor    String?  @db.VarChar(120)
-  semestre     String?  @db.VarChar(10)
-  cargaHoraria Int?     @map("carga_horaria")
-  horario      String?  @db.VarChar(120)
-  usuarioId    Int      @map("usuario_id")
-  criadoEm     DateTime @default(now()) @map("criado_em")
+  id             Int        @id @default(autoincrement())
+  nome           String     @db.VarChar(120)
+  professor      String?    @db.VarChar(120)
+  semestre       String?    @db.VarChar(10)
+  cargaHoraria   Int?       @map("carga_horaria")
+  horario        String?    @db.VarChar(120)
+  // Critérios de avaliação (Etapa 2)
+  regraMedia     RegraMedia @default(PONDERADA) @map("regra_media")
+  mediaAprovacao Decimal?   @map("media_aprovacao") @db.Decimal(4, 2)
+  limiteFaltas   Decimal    @default(25) @map("limite_faltas") @db.Decimal(5, 2)
+  usuarioId      Int        @map("usuario_id")
+  criadoEm       DateTime   @default(now()) @map("criado_em")
 
-  usuario Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  eventos Evento[]
+  usuario     Usuario              @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  eventos     Evento[]
+  frequencias RegistroFrequencia[]
 
   @@unique([usuarioId, nome])
   @@map("disciplina")
@@ -66,6 +76,8 @@ model Evento {
   data         DateTime     @db.Date
   peso         Decimal      @db.Decimal(5, 2)
   status       StatusEvento @default(PENDENTE)
+  nota         Decimal?     @db.Decimal(5, 2)
+  notaMaxima   Decimal      @default(10) @map("nota_maxima") @db.Decimal(5, 2)
   disciplinaId Int          @map("disciplina_id")
   criadoEm     DateTime     @default(now()) @map("criado_em")
   atualizadoEm DateTime     @updatedAt @map("atualizado_em")
@@ -74,6 +86,22 @@ model Evento {
 
   @@index([data])
   @@map("evento")
+}
+
+// Uma linha por dia de aula: quantas aulas houve e em quantas o aluno faltou.
+model RegistroFrequencia {
+  id              Int      @id @default(autoincrement())
+  data            DateTime @db.Date
+  quantidadeAulas Int      @default(1) @map("quantidade_aulas")
+  faltas          Int      @default(0)
+  disciplinaId    Int      @map("disciplina_id")
+  criadoEm        DateTime @default(now()) @map("criado_em")
+  atualizadoEm    DateTime @updatedAt @map("atualizado_em")
+
+  disciplina Disciplina @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+
+  @@unique([disciplinaId, data])
+  @@map("registro_frequencia")
 }
 
 model LogAuditoria {

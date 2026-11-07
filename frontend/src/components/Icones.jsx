@@ -36,6 +36,15 @@ export function IconeCalendario() {
   );
 }
 
+export function IconeNotas() {
+  return (
+    <Icone>
+      <rect x="5" y="4" width="14" height="17" rx="2" />
+      <path d="M9 4V3h6v1M9 9h6M9 13h6M9 17h4" />
+    </Icone>
+  );
+}
+
 export function IconeDisciplinas() {
   return (
     <Icone>

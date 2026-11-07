@@ -29,12 +29,16 @@ export type AggregateEvento = {
 export type EventoAvgAggregateOutputType = {
   id: number | null
   peso: runtime.Decimal | null
+  nota: runtime.Decimal | null
+  notaMaxima: runtime.Decimal | null
   disciplinaId: number | null
 }
 
 export type EventoSumAggregateOutputType = {
   id: number | null
   peso: runtime.Decimal | null
+  nota: runtime.Decimal | null
+  notaMaxima: runtime.Decimal | null
   disciplinaId: number | null
 }
 
@@ -45,6 +49,8 @@ export type EventoMinAggregateOutputType = {
   data: Date | null
   peso: runtime.Decimal | null
   status: $Enums.StatusEvento | null
+  nota: runtime.Decimal | null
+  notaMaxima: runtime.Decimal | null
   disciplinaId: number | null
   criadoEm: Date | null
   atualizadoEm: Date | null
@@ -57,6 +63,8 @@ export type EventoMaxAggregateOutputType = {
   data: Date | null
   peso: runtime.Decimal | null
   status: $Enums.StatusEvento | null
+  nota: runtime.Decimal | null
+  notaMaxima: runtime.Decimal | null
   disciplinaId: number | null
   criadoEm: Date | null
   atualizadoEm: Date | null
@@ -69,6 +77,8 @@ export type EventoCountAggregateOutputType = {
   data: number
   peso: number
   status: number
+  nota: number
+  notaMaxima: number
   disciplinaId: number
   criadoEm: number
   atualizadoEm: number
@@ -79,12 +89,16 @@ export type EventoCountAggregateOutputType = {
 export type EventoAvgAggregateInputType = {
   id?: true
   peso?: true
+  nota?: true
+  notaMaxima?: true
   disciplinaId?: true
 }
 
 export type EventoSumAggregateInputType = {
   id?: true
   peso?: true
+  nota?: true
+  notaMaxima?: true
   disciplinaId?: true
 }
 
@@ -95,6 +109,8 @@ export type EventoMinAggregateInputType = {
   data?: true
   peso?: true
   status?: true
+  nota?: true
+  notaMaxima?: true
   disciplinaId?: true
   criadoEm?: true
   atualizadoEm?: true
@@ -107,6 +123,8 @@ export type EventoMaxAggregateInputType = {
   data?: true
   peso?: true
   status?: true
+  nota?: true
+  notaMaxima?: true
   disciplinaId?: true
   criadoEm?: true
   atualizadoEm?: true
@@ -119,6 +137,8 @@ export type EventoCountAggregateInputType = {
   data?: true
   peso?: true
   status?: true
+  nota?: true
+  notaMaxima?: true
   disciplinaId?: true
   criadoEm?: true
   atualizadoEm?: true
@@ -218,6 +238,8 @@ export type EventoGroupByOutputType = {
   data: Date
   peso: runtime.Decimal
   status: $Enums.StatusEvento
+  nota: runtime.Decimal | null
+  notaMaxima: runtime.Decimal
   disciplinaId: number
   criadoEm: Date
   atualizadoEm: Date
@@ -253,6 +275,8 @@ export type EventoWhereInput = {
   data?: Prisma.DateTimeFilter<"Evento"> | Date | string
   peso?: Prisma.DecimalFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFilter<"Evento"> | $Enums.StatusEvento
+  nota?: Prisma.DecimalNullableFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   disciplinaId?: Prisma.IntFilter<"Evento"> | number
   criadoEm?: Prisma.DateTimeFilter<"Evento"> | Date | string
   atualizadoEm?: Prisma.DateTimeFilter<"Evento"> | Date | string
@@ -266,6 +290,8 @@ export type EventoOrderByWithRelationInput = {
   data?: Prisma.SortOrder
   peso?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  nota?: Prisma.SortOrderInput | Prisma.SortOrder
+  notaMaxima?: Prisma.SortOrder
   disciplinaId?: Prisma.SortOrder
   criadoEm?: Prisma.SortOrder
   atualizadoEm?: Prisma.SortOrder
@@ -282,6 +308,8 @@ export type EventoWhereUniqueInput = Prisma.AtLeast<{
   data?: Prisma.DateTimeFilter<"Evento"> | Date | string
   peso?: Prisma.DecimalFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFilter<"Evento"> | $Enums.StatusEvento
+  nota?: Prisma.DecimalNullableFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   disciplinaId?: Prisma.IntFilter<"Evento"> | number
   criadoEm?: Prisma.DateTimeFilter<"Evento"> | Date | string
   atualizadoEm?: Prisma.DateTimeFilter<"Evento"> | Date | string
@@ -295,6 +323,8 @@ export type EventoOrderByWithAggregationInput = {
   data?: Prisma.SortOrder
   peso?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  nota?: Prisma.SortOrderInput | Prisma.SortOrder
+  notaMaxima?: Prisma.SortOrder
   disciplinaId?: Prisma.SortOrder
   criadoEm?: Prisma.SortOrder
   atualizadoEm?: Prisma.SortOrder
@@ -315,6 +345,8 @@ export type EventoScalarWhereWithAggregatesInput = {
   data?: Prisma.DateTimeWithAggregatesFilter<"Evento"> | Date | string
   peso?: Prisma.DecimalWithAggregatesFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoWithAggregatesFilter<"Evento"> | $Enums.StatusEvento
+  nota?: Prisma.DecimalNullableWithAggregatesFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalWithAggregatesFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   disciplinaId?: Prisma.IntWithAggregatesFilter<"Evento"> | number
   criadoEm?: Prisma.DateTimeWithAggregatesFilter<"Evento"> | Date | string
   atualizadoEm?: Prisma.DateTimeWithAggregatesFilter<"Evento"> | Date | string
@@ -326,6 +358,8 @@ export type EventoCreateInput = {
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
+  nota?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: runtime.Decimal | runtime.DecimalJsLike | number | string
   criadoEm?: Date | string
   atualizadoEm?: Date | string
   disciplina: Prisma.DisciplinaCreateNestedOneWithoutEventosInput
@@ -338,6 +372,8 @@ export type EventoUncheckedCreateInput = {
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
+  nota?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: runtime.Decimal | runtime.DecimalJsLike | number | string
   disciplinaId: number
   criadoEm?: Date | string
   atualizadoEm?: Date | string
@@ -349,6 +385,8 @@ export type EventoUpdateInput = {
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
+  nota?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   criadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   atualizadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   disciplina?: Prisma.DisciplinaUpdateOneRequiredWithoutEventosNestedInput
@@ -361,6 +399,8 @@ export type EventoUncheckedUpdateInput = {
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
+  nota?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   disciplinaId?: Prisma.IntFieldUpdateOperationsInput | number
   criadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   atualizadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -373,6 +413,8 @@ export type EventoCreateManyInput = {
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
+  nota?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: runtime.Decimal | runtime.DecimalJsLike | number | string
   disciplinaId: number
   criadoEm?: Date | string
   atualizadoEm?: Date | string
@@ -384,6 +426,8 @@ export type EventoUpdateManyMutationInput = {
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
+  nota?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   criadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   atualizadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -395,6 +439,8 @@ export type EventoUncheckedUpdateManyInput = {
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
+  nota?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   disciplinaId?: Prisma.IntFieldUpdateOperationsInput | number
   criadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   atualizadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -417,6 +463,8 @@ export type EventoCountOrderByAggregateInput = {
   data?: Prisma.SortOrder
   peso?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  nota?: Prisma.SortOrder
+  notaMaxima?: Prisma.SortOrder
   disciplinaId?: Prisma.SortOrder
   criadoEm?: Prisma.SortOrder
   atualizadoEm?: Prisma.SortOrder
@@ -425,6 +473,8 @@ export type EventoCountOrderByAggregateInput = {
 export type EventoAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   peso?: Prisma.SortOrder
+  nota?: Prisma.SortOrder
+  notaMaxima?: Prisma.SortOrder
   disciplinaId?: Prisma.SortOrder
 }
 
@@ -435,6 +485,8 @@ export type EventoMaxOrderByAggregateInput = {
   data?: Prisma.SortOrder
   peso?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  nota?: Prisma.SortOrder
+  notaMaxima?: Prisma.SortOrder
   disciplinaId?: Prisma.SortOrder
   criadoEm?: Prisma.SortOrder
   atualizadoEm?: Prisma.SortOrder
@@ -447,6 +499,8 @@ export type EventoMinOrderByAggregateInput = {
   data?: Prisma.SortOrder
   peso?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  nota?: Prisma.SortOrder
+  notaMaxima?: Prisma.SortOrder
   disciplinaId?: Prisma.SortOrder
   criadoEm?: Prisma.SortOrder
   atualizadoEm?: Prisma.SortOrder
@@ -455,6 +509,8 @@ export type EventoMinOrderByAggregateInput = {
 export type EventoSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   peso?: Prisma.SortOrder
+  nota?: Prisma.SortOrder
+  notaMaxima?: Prisma.SortOrder
   disciplinaId?: Prisma.SortOrder
 }
 
@@ -504,14 +560,6 @@ export type EnumTipoEventoFieldUpdateOperationsInput = {
   set?: $Enums.TipoEvento
 }
 
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
 export type EnumStatusEventoFieldUpdateOperationsInput = {
   set?: $Enums.StatusEvento
 }
@@ -522,6 +570,8 @@ export type EventoCreateWithoutDisciplinaInput = {
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
+  nota?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: runtime.Decimal | runtime.DecimalJsLike | number | string
   criadoEm?: Date | string
   atualizadoEm?: Date | string
 }
@@ -533,6 +583,8 @@ export type EventoUncheckedCreateWithoutDisciplinaInput = {
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
+  nota?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: runtime.Decimal | runtime.DecimalJsLike | number | string
   criadoEm?: Date | string
   atualizadoEm?: Date | string
 }
@@ -573,6 +625,8 @@ export type EventoScalarWhereInput = {
   data?: Prisma.DateTimeFilter<"Evento"> | Date | string
   peso?: Prisma.DecimalFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFilter<"Evento"> | $Enums.StatusEvento
+  nota?: Prisma.DecimalNullableFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   disciplinaId?: Prisma.IntFilter<"Evento"> | number
   criadoEm?: Prisma.DateTimeFilter<"Evento"> | Date | string
   atualizadoEm?: Prisma.DateTimeFilter<"Evento"> | Date | string
@@ -585,6 +639,8 @@ export type EventoCreateManyDisciplinaInput = {
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
+  nota?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: runtime.Decimal | runtime.DecimalJsLike | number | string
   criadoEm?: Date | string
   atualizadoEm?: Date | string
 }
@@ -595,6 +651,8 @@ export type EventoUpdateWithoutDisciplinaInput = {
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
+  nota?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   criadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   atualizadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -606,6 +664,8 @@ export type EventoUncheckedUpdateWithoutDisciplinaInput = {
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
+  nota?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   criadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   atualizadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -617,6 +677,8 @@ export type EventoUncheckedUpdateManyWithoutDisciplinaInput = {
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
+  nota?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  notaMaxima?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   criadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   atualizadoEm?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -630,6 +692,8 @@ export type EventoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   data?: boolean
   peso?: boolean
   status?: boolean
+  nota?: boolean
+  notaMaxima?: boolean
   disciplinaId?: boolean
   criadoEm?: boolean
   atualizadoEm?: boolean
@@ -643,6 +707,8 @@ export type EventoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   data?: boolean
   peso?: boolean
   status?: boolean
+  nota?: boolean
+  notaMaxima?: boolean
   disciplinaId?: boolean
   criadoEm?: boolean
   atualizadoEm?: boolean
@@ -656,6 +722,8 @@ export type EventoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   data?: boolean
   peso?: boolean
   status?: boolean
+  nota?: boolean
+  notaMaxima?: boolean
   disciplinaId?: boolean
   criadoEm?: boolean
   atualizadoEm?: boolean
@@ -669,12 +737,14 @@ export type EventoSelectScalar = {
   data?: boolean
   peso?: boolean
   status?: boolean
+  nota?: boolean
+  notaMaxima?: boolean
   disciplinaId?: boolean
   criadoEm?: boolean
   atualizadoEm?: boolean
 }
 
-export type EventoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titulo" | "tipo" | "data" | "peso" | "status" | "disciplinaId" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["evento"]>
+export type EventoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titulo" | "tipo" | "data" | "peso" | "status" | "nota" | "notaMaxima" | "disciplinaId" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["evento"]>
 export type EventoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   disciplina?: boolean | Prisma.DisciplinaDefaultArgs<ExtArgs>
 }
@@ -697,6 +767,8 @@ export type $EventoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     data: Date
     peso: runtime.Decimal
     status: $Enums.StatusEvento
+    nota: runtime.Decimal | null
+    notaMaxima: runtime.Decimal
     disciplinaId: number
     criadoEm: Date
     atualizadoEm: Date
@@ -1130,6 +1202,8 @@ export interface EventoFieldRefs {
   readonly data: Prisma.FieldRef<"Evento", 'DateTime'>
   readonly peso: Prisma.FieldRef<"Evento", 'Decimal'>
   readonly status: Prisma.FieldRef<"Evento", 'StatusEvento'>
+  readonly nota: Prisma.FieldRef<"Evento", 'Decimal'>
+  readonly notaMaxima: Prisma.FieldRef<"Evento", 'Decimal'>
   readonly disciplinaId: Prisma.FieldRef<"Evento", 'Int'>
   readonly criadoEm: Prisma.FieldRef<"Evento", 'DateTime'>
   readonly atualizadoEm: Prisma.FieldRef<"Evento", 'DateTime'>

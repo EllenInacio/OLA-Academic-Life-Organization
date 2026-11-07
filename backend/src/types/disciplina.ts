@@ -1,9 +1,14 @@
+export const REGRAS_MEDIA = ["PONDERADA", "ARITMETICA"];
+
 export type DadosDisciplina = {
   nome: string;
   professor?: string | null;
   semestre?: string | null;
   cargaHoraria?: number | null;
   horario?: string | null;
+  regraMedia?: "PONDERADA" | "ARITMETICA";
+  mediaAprovacao?: number | null; 
+  limiteFaltas?: number;
 };
 
 // Semestre no formato AAAA.N (ex.: 2026.2).

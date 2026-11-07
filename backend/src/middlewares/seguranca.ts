@@ -20,6 +20,7 @@ export const loginLimiter = limitador(
   false
 );
 
+
 export const verificacao2faLimiter = limitador(
   8,
   "Muitas tentativas de verificação do código. Aguarde 15 minutos ou faça login novamente."
@@ -34,6 +35,7 @@ export const solicitacaoRecuperacaoLimiter = limitador(
   3,
   "Muitas solicitações de recuperação de senha. Aguarde 15 minutos antes de tentar novamente."
 );
+
 
 export const recuperacaoLimiter = limitador(
   4,

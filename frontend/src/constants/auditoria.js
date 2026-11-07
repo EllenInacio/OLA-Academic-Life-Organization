@@ -19,6 +19,11 @@ export const ROTULOS_ACAO = {
   EVENTO_CRIADO: "Evento cadastrado",
   EVENTO_ALTERADO: "Evento alterado",
   EVENTO_EXCLUIDO: "Evento excluído",
+  NOTA_LANCADA: "Nota lançada",
+  NOTA_REMOVIDA: "Nota removida",
+  FREQUENCIA_REGISTRADA: "Frequência registrada",
+  FREQUENCIA_ALTERADA: "Frequência alterada",
+  FREQUENCIA_EXCLUIDA: "Frequência excluída",
 };
 
 export function rotuloDaAcao(acao) {
