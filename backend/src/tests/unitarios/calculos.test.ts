@@ -51,7 +51,7 @@ describe("Cálculos de prazo", () => {
 
   it("conta dias corridos, inclusive entre meses e anos", () => {
     expect(diasEntre("2026-10-13", "2026-10-13")).toBe(0);
-    expect(diasEntre("2026-10-13", "2026-10-16")).toBe(5);
+    expect(diasEntre("2026-10-13", "2026-10-16")).toBe(3);
     expect(diasEntre("2026-10-13", "2026-10-10")).toBe(-3);
     expect(diasEntre("2026-12-30", "2027-01-02")).toBe(3);
     expect(diasEntre("2028-02-28", "2028-03-01")).toBe(2); // ano bissexto
