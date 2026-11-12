@@ -7,9 +7,9 @@ const senhaDeApp = process.env.GMAIL_APP_PASSWORD;
 const transporter =
   remetente && senhaDeApp
     ? nodemailer.createTransport({
-        service: "gmail",
-        auth: { user: remetente, pass: senhaDeApp },
-      })
+      service: "gmail",
+      auth: { user: remetente, pass: senhaDeApp },
+    })
     : null;
 
 function escaparHtml(texto: string) {
@@ -54,7 +54,7 @@ async function enviar(
   html: string,
   resumo: string
 ) {
-  if (process.env.NODE_ENV === "test") return;
+  if (process.env.NODE_ENV === "test") {return;}
 
   if (!transporter) {
     const mensagem = "[e-mail] GMAIL_USER e GMAIL_APP_PASSWORD não configurados.";
@@ -87,7 +87,7 @@ async function enviar(
       erro
     );
 
-    throw new Error("Não foi possível enviar o e-mail.");
+    throw new Error("Não foi possível enviar o e-mail.", { cause: erro });
   }
 }
 

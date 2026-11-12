@@ -1,4 +1,4 @@
-import { dataDeHoje, diasEntre, paraDataISO } from "../calculos/prazos";
+import { dataDeHoje, diasEntre, paraDataISO } from "../../calculos/prazos";
 import {
   DisciplinaParaCalculo,
   EventoParaCalculo,
@@ -6,7 +6,7 @@ import {
   gerarAlertasDePrazo,
   montarPainel,
   proximosEventos,
-} from "../calculos/painel";
+} from "../../calculos/painel";
 
 const HOJE = "2026-10-13";
 const CALCULO = { id: 1, nome: "Cálculo I" };

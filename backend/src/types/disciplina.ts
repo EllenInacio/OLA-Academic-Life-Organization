@@ -7,10 +7,10 @@ export type DadosDisciplina = {
   cargaHoraria?: number | null;
   horario?: string | null;
   inicioAulas?: string | null;
-  fimAulas?: string | null; 
+  fimAulas?: string | null;
   regraMedia?: "PONDERADA" | "ARITMETICA";
-  mediaAprovacao?: number | null; 
-  limiteFaltas?: number; 
+  mediaAprovacao?: number | null;
+  limiteFaltas?: number;
 };
 
 export const FORMATO_SEMESTRE = /^\d{4}\.[1-4]$/;

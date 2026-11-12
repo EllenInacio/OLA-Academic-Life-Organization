@@ -1,11 +1,11 @@
 import request from "supertest";
-import app from "../app";
-import { prisma } from "../config/prisma";
-import * as emailService from "../services/emailService";
-import { limparBanco } from "./banco";
-import { criarUsuarioDeTeste } from "./usuarioDeTeste";
+import app from "../../app";
+import { prisma } from "../../config/prisma";
+import * as emailService from "../../services/emailService";
+import { limparBanco } from "../banco";
+import { criarUsuarioDeTeste } from "../usuarioDeTeste";
 
-jest.mock("../services/emailService");
+jest.mock("../../services/emailService");
 
 const enviarCodigoRecuperacao = emailService.enviarCodigoRecuperacao as jest.Mock;
 

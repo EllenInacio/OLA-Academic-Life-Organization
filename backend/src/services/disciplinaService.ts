@@ -64,7 +64,7 @@ export async function criar(usuarioId: number, dados: DadosDisciplina) {
   try {
     return await disciplinaModel.criar(usuarioId, dados);
   } catch (erro) {
-    if (ehNomeRepetido(erro)) throw new AppError(NOME_REPETIDO, 409);
+    if (ehNomeRepetido(erro)) {throw new AppError(NOME_REPETIDO, 409);}
     throw erro;
   }
 }
@@ -81,7 +81,7 @@ export async function atualizar(usuarioId: number, id: number, dados: DadosDisci
   try {
     return await disciplinaModel.atualizar(id, dados);
   } catch (erro) {
-    if (ehNomeRepetido(erro)) throw new AppError(NOME_REPETIDO, 409);
+    if (ehNomeRepetido(erro)) {throw new AppError(NOME_REPETIDO, 409);}
     throw erro;
   }
 }

@@ -1,0 +1,138 @@
+# Pipeline de integração contínua do OLA (backend).
+# Roda a cada Pull Request aberto ou atualizado para a main, em ambiente limpo,
+# com 3 checagens independentes que rodam em paralelo: testes unitários,
+# testes de integração e linter. Não há deploy (somente CI).
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+# Permissões mínimas: o workflow só precisa ler o código.
+permissions:
+  contents: read
+
+# Falhe rápido: um novo push no mesmo PR cancela a execução anterior, que ficou obsoleta.
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: backend
+
+env:
+  NODE_VERSION: "22"
+  NODE_ENV: test
+  APP_TIMEZONE: America/Sao_Paulo
+  JWT_EXPIRES_IN: 1h
+  CORS_ORIGIN: http://localhost:5173
+
+jobs:
+  testes-unitarios:
+    name: Testes unitários
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # Chaves descartáveis, geradas a cada execução (nenhum segredo fica no arquivo).
+      - name: Gerar chaves temporárias de teste
+        run: |
+          JWT_SECRET=$(openssl rand -hex 48)
+          ENCRYPTION_KEY=$(openssl rand -hex 32)
+          echo "::add-mask::$JWT_SECRET"
+          echo "::add-mask::$ENCRYPTION_KEY"
+          echo "JWT_SECRET=$JWT_SECRET" >> "$GITHUB_ENV"
+          echo "ENCRYPTION_KEY=$ENCRYPTION_KEY" >> "$GITHUB_ENV"
+
+      # Somente src/tests/unitarios: sem banco (nenhum DATABASE_URL neste job), sem servidor e sem rede.
+      - name: Executar testes unitários
+        run: npm run test:unit
+
+  testes-integracao:
+    name: Testes de integração
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      # PostgreSQL descartável, criado só para este job (mesmo SGBD da aplicação).
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: ola_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres@localhost:5432/ola_test?schema=public
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Gerar chaves temporárias de teste
+        run: |
+          JWT_SECRET=$(openssl rand -hex 48)
+          ENCRYPTION_KEY=$(openssl rand -hex 32)
+          echo "::add-mask::$JWT_SECRET"
+          echo "::add-mask::$ENCRYPTION_KEY"
+          echo "JWT_SECRET=$JWT_SECRET" >> "$GITHUB_ENV"
+          echo "ENCRYPTION_KEY=$ENCRYPTION_KEY" >> "$GITHUB_ENV"
+
+      - name: Gerar o Prisma Client
+        run: npx prisma generate
+
+      - name: Aplicar migrações no banco de teste
+        run: npx prisma migrate deploy
+
+      # Somente src/tests/integracao: API + services + PostgreSQL de teste.
+      - name: Executar testes de integração
+        run: npm run test:integration
+
+  linter:
+    name: Linter
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v7
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # Regras em backend/eslint.config.mjs; qualquer erro ou aviso reprova (--max-warnings 0).
+      - name: Executar ESLint
+        run: npm run lint

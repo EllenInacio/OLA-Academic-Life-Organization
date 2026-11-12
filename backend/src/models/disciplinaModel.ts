@@ -7,7 +7,7 @@ const COM_DADOS_ACADEMICOS = {
 };
 
 function dataDoPeriodo(valor?: string | null) {
-  if (valor === undefined) return undefined;
+  if (valor === undefined) {return undefined;}
   return valor ? new Date(valor) : null;
 }
 

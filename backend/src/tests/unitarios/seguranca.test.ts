@@ -1,7 +1,7 @@
-import { criptografar, descriptografar } from "../utils/criptografia";
-import { codigoConfere, gerarCodigo, hashCodigo } from "../utils/codigo";
-import { gerarHashSenha, senhaConfere } from "../utils/senha";
-import { gerarToken, lerToken } from "../utils/token";
+import { criptografar, descriptografar } from "../../utils/criptografia";
+import { codigoConfere, gerarCodigo, hashCodigo } from "../../utils/codigo";
+import { gerarHashSenha, senhaConfere } from "../../utils/senha";
+import { gerarToken, lerToken } from "../../utils/token";
 
 describe("Utilitários de segurança", () => {
   it("criptografa e descriptografa com AES-256-GCM", () => {

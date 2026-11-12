@@ -15,12 +15,12 @@ export type CriteriosDeNota = {
 };
 
 export type SituacaoNota =
-  | "SEM_NOTAS" 
-  | "SEM_CRITERIO" 
-  | "PARCIAL_ACIMA" 
-  | "PARCIAL_ABAIXO" 
+  | "SEM_NOTAS"
+  | "SEM_CRITERIO"
+  | "PARCIAL_ACIMA"
+  | "PARCIAL_ABAIXO"
   | "ATINGIU_MEDIA"
-  | "ABAIXO_DA_MEDIA"; 
+  | "ABAIXO_DA_MEDIA";
 
 export function ehAvaliativo(evento: Pick<AvaliacaoParaCalculo, "peso">) {
   return evento.peso > 0;
@@ -41,7 +41,7 @@ export function calcularNotaNecessaria(
   pesoRestante: number,
   mediaAprovacao: number
 ) {
-  if (pesoRestante <= 0) return null;
+  if (pesoRestante <= 0) {return null;}
 
   const necessaria = (mediaAprovacao * (pesoLancado + pesoRestante) - somaPonderada) / pesoRestante;
 
@@ -72,10 +72,10 @@ export function calcularDesempenho(
   const { mediaAprovacao } = criterios;
 
   let situacao: SituacaoNota;
-  if (media === null) situacao = "SEM_NOTAS";
-  else if (mediaAprovacao === null) situacao = "SEM_CRITERIO";
-  else if (final) situacao = media >= mediaAprovacao ? "ATINGIU_MEDIA" : "ABAIXO_DA_MEDIA";
-  else situacao = media >= mediaAprovacao ? "PARCIAL_ACIMA" : "PARCIAL_ABAIXO";
+  if (media === null) {situacao = "SEM_NOTAS";}
+  else if (mediaAprovacao === null) {situacao = "SEM_CRITERIO";}
+  else if (final) {situacao = media >= mediaAprovacao ? "ATINGIU_MEDIA" : "ABAIXO_DA_MEDIA";}
+  else {situacao = media >= mediaAprovacao ? "PARCIAL_ACIMA" : "PARCIAL_ABAIXO";}
 
   return {
     regraMedia: criterios.regraMedia,
@@ -87,7 +87,7 @@ export function calcularDesempenho(
       total: avaliacoes.length,
       comNota: comNota.length,
       semNota: semNota.length,
-      aguardandoNota: semNota.filter((a) => a.data <= hoje).length, 
+      aguardandoNota: semNota.filter((a) => a.data <= hoje).length,
       naoAvaliativos: eventos.length - avaliacoes.length,
     },
     notaNecessaria:

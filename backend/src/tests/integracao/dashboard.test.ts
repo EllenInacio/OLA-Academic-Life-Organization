@@ -1,9 +1,9 @@
 import request from "supertest";
-import app from "../app";
-import { prisma } from "../config/prisma";
-import { limparBanco } from "./banco";
-import { criarUsuarioDeTeste } from "./usuarioDeTeste";
-import { dataRelativa } from "./datas";
+import app from "../../app";
+import { prisma } from "../../config/prisma";
+import { limparBanco } from "../banco";
+import { criarUsuarioDeTeste } from "../usuarioDeTeste";
+import { dataRelativa } from "../datas";
 
 let autorizacao: Record<string, string>;
 
@@ -76,19 +76,22 @@ describe("Dashboard", () => {
       avaliacoesAguardandoNota: 2, // "Lista 1" e "Lista atrasada": data passada, sem nota
       disciplinasEmAtencao: 0,
     });
-    expect(painel.proximosEventos.map((e: { titulo: string; diasRestantes: number }) => [e.titulo, e.diasRestantes])).toEqual([
+    type EventoResposta = { titulo: string; diasRestantes: number };
+    expect(painel.proximosEventos.map((e: EventoResposta) => [e.titulo, e.diasRestantes])).toEqual([
       ["Prova de SQL", 2],
       ["Prova 2", 11],
     ]);
     expect(painel.proximosEventos[0].disciplina).toEqual({ id: banco, nome: "Banco de Dados" });
     type AlertaResposta = { tipo: string; nivel: string; evento?: { titulo: string }; disciplina: { nome: string } };
-    expect(painel.alertas.map((a: AlertaResposta) => [a.tipo, a.nivel, a.evento?.titulo ?? a.disciplina.nome])).toEqual([
+    const resumoDoAlerta = (a: AlertaResposta) => [a.tipo, a.nivel, a.evento?.titulo ?? a.disciplina.nome];
+    expect(painel.alertas.map(resumoDoAlerta)).toEqual([
       ["PRAZO_PROXIMO", "alto", "Prova de SQL"],
       ["PRAZO_VENCIDO", "medio", "Lista atrasada"],
       // "Lista 1" está concluída, com data passada e sem nota lançada
       ["NOTA_AGUARDANDO", "medio", "Banco de Dados"],
     ]);
-    expect(painel.disciplinas.map((d: { nome: string; eventos: { total: number } }) => [d.nome, d.eventos.total])).toEqual([
+    type DisciplinaResposta = { nome: string; eventos: { total: number } };
+    expect(painel.disciplinas.map((d: DisciplinaResposta) => [d.nome, d.eventos.total])).toEqual([
       ["Banco de Dados", 2],
       ["Cálculo I", 2],
     ]);

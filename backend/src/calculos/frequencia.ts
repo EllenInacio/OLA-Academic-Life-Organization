@@ -10,7 +10,7 @@ export type RegistroParaCalculo = {
 
 export type CriteriosDeFrequencia = {
   cargaHoraria: number | null;
-  limiteFaltas: number; 
+  limiteFaltas: number;
 };
 
 export type SituacaoFrequencia =
@@ -20,14 +20,14 @@ export type SituacaoFrequencia =
   | "ACIMA_DO_LIMITE";
 
 function situacaoPelaQuantidade(faltas: number, permitidas: number): SituacaoFrequencia {
-  if (faltas > permitidas) return "ACIMA_DO_LIMITE";
-  if (faltas > 0 && faltas >= LIMIAR_ATENCAO * permitidas) return "PERTO_DO_LIMITE";
+  if (faltas > permitidas) {return "ACIMA_DO_LIMITE";}
+  if (faltas > 0 && faltas >= LIMIAR_ATENCAO * permitidas) {return "PERTO_DO_LIMITE";}
   return "DENTRO_DO_LIMITE";
 }
 
 function situacaoPeloPercentual(percentual: number, limite: number): SituacaoFrequencia {
-  if (percentual > limite) return "ACIMA_DO_LIMITE";
-  if (percentual > 0 && percentual >= LIMIAR_ATENCAO * limite) return "PERTO_DO_LIMITE";
+  if (percentual > limite) {return "ACIMA_DO_LIMITE";}
+  if (percentual > 0 && percentual >= LIMIAR_ATENCAO * limite) {return "PERTO_DO_LIMITE";}
   return "DENTRO_DO_LIMITE";
 }
 
@@ -56,7 +56,7 @@ export function calcularFrequencia(registros: RegistroParaCalculo[], criterios: 
     faltas,
     presencas: aulasRegistradas - faltas,
     percentualFaltas,
-    percentualPresenca: percentualFaltas === null ? null 
+    percentualPresenca: percentualFaltas === null ? null
       : arredondar(100 - percentualFaltas),
     aulasPrevistas,
     faltasPermitidas,

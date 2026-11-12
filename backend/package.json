@@ -9,7 +9,10 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "jest",
+    "test:unit": "jest --testPathPatterns src/tests/unitarios",
+    "test:integration": "jest --testPathPatterns src/tests/integracao",
     "test:coverage": "jest --coverage",
+    "lint": "eslint . --max-warnings 0",
     "test:db": "dotenv -e .env.test -- prisma migrate deploy",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
@@ -31,6 +34,8 @@
     "speakeasy": "^2.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
@@ -41,11 +46,14 @@
     "@types/speakeasy": "^2.0.10",
     "@types/supertest": "^7.2.1",
     "dotenv-cli": "^11.0.0",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
     "jest": "^30.5.1",
     "prisma": "7.10.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.12",
     "tsx": "^4.23.13",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.2"
   }
 }
