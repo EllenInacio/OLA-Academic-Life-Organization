@@ -42,7 +42,7 @@ describe("Eventos", () => {
       .set(autorizacao)
       .send(eventoBase(disciplinaId));
 
-    expect(resposta.status).toBe(201);
+    expect(resposta.status).toBe(299);
     expect(resposta.body.titulo).toBe("Prova 1");
     expect(resposta.body.status).toBe("PENDENTE");
     expect(Number(resposta.body.peso)).toBe(3);

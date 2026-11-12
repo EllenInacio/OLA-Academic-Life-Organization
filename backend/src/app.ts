@@ -24,3 +24,4 @@ app.use((_req, res) => {
 app.use(errorHandler);
 
 export default app;
+var teste = 'quebra'
