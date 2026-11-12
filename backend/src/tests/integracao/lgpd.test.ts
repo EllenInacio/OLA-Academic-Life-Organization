@@ -1,8 +1,8 @@
 import request from "supertest";
-import app from "../app";
-import { prisma } from "../config/prisma";
-import { limparBanco } from "./banco";
-import { criarUsuarioDeTeste, SENHA_DE_TESTE } from "./usuarioDeTeste";
+import app from "../../app";
+import { prisma } from "../../config/prisma";
+import { limparBanco } from "../banco";
+import { criarUsuarioDeTeste, SENHA_DE_TESTE } from "../usuarioDeTeste";
 
 let autorizacao: Record<string, string>;
 let usuarioId: number;

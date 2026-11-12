@@ -1,8 +1,8 @@
 import request from "supertest";
-import app from "../app";
-import { prisma } from "../config/prisma";
-import { limparBanco } from "./banco";
-import { criarUsuarioDeTeste } from "./usuarioDeTeste";
+import app from "../../app";
+import { prisma } from "../../config/prisma";
+import { limparBanco } from "../banco";
+import { criarUsuarioDeTeste } from "../usuarioDeTeste";
 
 describe("Autorização e auditoria do calendário", () => {
   beforeEach(async () => {

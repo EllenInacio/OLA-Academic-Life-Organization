@@ -9,6 +9,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "jest",
+    "test:unit": "jest --testPathPatterns src/tests/unitarios",
+    "test:integration": "jest --testPathPatterns src/tests/integracao",
     "test:coverage": "jest --coverage",
     "test:db": "dotenv -e .env.test -- prisma migrate deploy",
     "prisma:migrate": "prisma migrate dev",

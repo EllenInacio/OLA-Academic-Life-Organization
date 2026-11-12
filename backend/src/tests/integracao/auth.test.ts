@@ -1,12 +1,12 @@
 import request from "supertest";
 import speakeasy from "speakeasy";
-import app from "../app";
-import { prisma } from "../config/prisma";
-import * as emailService from "../services/emailService";
-import { limparBanco } from "./banco";
-import { criarUsuarioDeTeste, SENHA_DE_TESTE } from "./usuarioDeTeste";
+import app from "../../app";
+import { prisma } from "../../config/prisma";
+import * as emailService from "../../services/emailService";
+import { limparBanco } from "../banco";
+import { criarUsuarioDeTeste, SENHA_DE_TESTE } from "../usuarioDeTeste";
 
-jest.mock("../services/emailService");
+jest.mock("../../services/emailService");
 
 const enviarCodigo2fa = emailService.enviarCodigo2fa as jest.Mock;
 

@@ -1,6 +1,6 @@
-import { calcularDesempenho, calcularNotaNecessaria, notaNaEscala, AvaliacaoParaCalculo } from "../calculos/notas";
-import { calcularFrequencia } from "../calculos/frequencia";
-import { DisciplinaParaCalculo, EventoParaCalculo, calcularMediaGeral, montarPainel } from "../calculos/painel";
+import { calcularDesempenho, calcularNotaNecessaria, notaNaEscala, AvaliacaoParaCalculo } from "../../calculos/notas";
+import { calcularFrequencia } from "../../calculos/frequencia";
+import { DisciplinaParaCalculo, EventoParaCalculo, calcularMediaGeral, montarPainel } from "../../calculos/painel";
 
 const HOJE = "2026-10-16";
 

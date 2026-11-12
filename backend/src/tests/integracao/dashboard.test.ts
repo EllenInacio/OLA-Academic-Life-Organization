@@ -1,9 +1,9 @@
 import request from "supertest";
-import app from "../app";
-import { prisma } from "../config/prisma";
-import { limparBanco } from "./banco";
-import { criarUsuarioDeTeste } from "./usuarioDeTeste";
-import { dataRelativa } from "./datas";
+import app from "../../app";
+import { prisma } from "../../config/prisma";
+import { limparBanco } from "../banco";
+import { criarUsuarioDeTeste } from "../usuarioDeTeste";
+import { dataRelativa } from "../datas";
 
 let autorizacao: Record<string, string>;
 
