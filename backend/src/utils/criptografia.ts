@@ -15,7 +15,7 @@ export function criptografar(texto: string): string {
 export function descriptografar(dado: string): string | null {
   try {
     const partes = dado.split(":");
-    if (partes.length !== 3) return null;
+    if (partes.length !== 3) {return null;}
 
     const iv = Buffer.from(partes[0], "hex");
     const authTag = Buffer.from(partes[1], "hex");

@@ -50,7 +50,7 @@ export async function criarUsuarioIntegracao() {
 
 export async function removerUsuariosCriados() {
   const ids = usuariosCriados.splice(0);
-  if (ids.length === 0) return;
+  if (ids.length === 0) {return;}
 
   await prisma.logAuditoria.deleteMany({ where: { usuarioId: { in: ids } } });
   await prisma.usuario.deleteMany({ where: { id: { in: ids } } });

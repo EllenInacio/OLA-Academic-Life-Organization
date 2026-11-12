@@ -38,11 +38,11 @@ export type EventoComPrazo = EventoParaCalculo & { diasRestantes: number };
 
 export type ContagemEventos = {
   total: number;
-  pendentes: number; 
-  emAndamento: number; 
-  concluidos: number; 
-  abertos: number; 
-  atrasados: number; 
+  pendentes: number;
+  emAndamento: number;
+  concluidos: number;
+  abertos: number;
+  atrasados: number;
 };
 
 export type TipoAlerta =
@@ -92,13 +92,13 @@ export function contarEventos(eventos: EventoParaCalculo[], hoje: string): Conta
   };
 
   for (const evento of eventos) {
-    if (evento.status === "PENDENTE") contagem.pendentes++;
-    if (evento.status === "EM_ANDAMENTO") contagem.emAndamento++;
-    if (evento.status === "CONCLUIDO") contagem.concluidos++;
+    if (evento.status === "PENDENTE") {contagem.pendentes++;}
+    if (evento.status === "EM_ANDAMENTO") {contagem.emAndamento++;}
+    if (evento.status === "CONCLUIDO") {contagem.concluidos++;}
 
     if (estaAberto(evento)) {
       contagem.abertos++;
-      if (evento.data < hoje) contagem.atrasados++;
+      if (evento.data < hoje) {contagem.atrasados++;}
     }
   }
 

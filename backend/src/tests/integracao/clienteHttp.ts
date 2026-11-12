@@ -1,6 +1,8 @@
 export type RespostaHttp = {
   status: number;
   headers: Headers;
+  // O corpo é o JSON devolvido pela API, com formato diferente em cada endpoint testado.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   corpo: any;
 };
 

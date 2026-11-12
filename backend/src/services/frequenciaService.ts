@@ -54,7 +54,7 @@ export async function criar(usuarioId: number, disciplinaId: number, dados: Dado
   try {
     return await registroFrequenciaModel.criar(disciplinaId, registro);
   } catch (erro) {
-    if (ehDataRepetida(erro)) await garantirDataLivre(disciplinaId, registro.data);
+    if (ehDataRepetida(erro)) {await garantirDataLivre(disciplinaId, registro.data);}
     throw erro;
   }
 }

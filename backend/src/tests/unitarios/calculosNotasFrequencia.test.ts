@@ -186,7 +186,9 @@ describe("Frequência da disciplina", () => {
   });
 
   it("avisa quando há mais aulas registradas do que a carga horária prevê", () => {
-    expect(calcularFrequencia(registros(3, 0), { cargaHoraria: 2, limiteFaltas: 25 }).registrosAcimaDoPrevisto).toBe(true);
+    const resultado = calcularFrequencia(registros(3, 0), { cargaHoraria: 2, limiteFaltas: 25 });
+
+    expect(resultado.registrosAcimaDoPrevisto).toBe(true);
   });
 });
 

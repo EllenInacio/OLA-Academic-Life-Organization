@@ -1,7 +1,7 @@
 export const MAXIMO_AULAS_POR_DIA = 12;
 
 export type DadosFrequencia = {
-  data: string; 
+  data: string;
   quantidadeAulas: number;
-  faltas: number; 
+  faltas: number;
 };

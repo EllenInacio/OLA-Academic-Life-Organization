@@ -27,10 +27,10 @@ export async function solicitar(email: string, ip?: string) {
   );
 
   await emailService.enviarCodigoRecuperacao(
-  usuario.email,
-  usuario.nome,
-  codigo
-);
+    usuario.email,
+    usuario.nome,
+    codigo
+  );
 
   await auditoriaService.registrar("RECUPERACAO_SOLICITADA", {
     usuarioId: usuario.id,
