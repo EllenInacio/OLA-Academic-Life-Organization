@@ -59,10 +59,13 @@ async function enviar(
   if (!transporter) {
     const mensagem = "[e-mail] GMAIL_USER e GMAIL_APP_PASSWORD não configurados.";
 
-    if (process.env.NODE_ENV === "production") {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.EMAIL_SIMULADO !== "true"
+    )     {
       console.error(mensagem);
       throw new Error(mensagem);
-    }
+}
 
     console.log(`[e-mail simulado] Para: ${para} | ${assunto} | ${resumo}`);
     return;
