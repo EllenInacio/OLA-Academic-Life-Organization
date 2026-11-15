@@ -94,7 +94,7 @@ export default function NotasFrequenciaPage() {
   return (
     <Pagina
       titulo="Notas e frequência"
-      subtitulo="Lance suas notas por etapa (M1 e M2) e registre presenças — as médias e o percentual de faltas são calculados automaticamente"
+      subtitulo="Acompanhe suas notas e frequências ao longo do semestre. Registre os resultados de cada etapa (M1 e M2) e visualize suas médias e frequência calculadas automaticamente"
     >
       <Mensagem texto={mensagem?.texto} tipo={mensagem?.tipo} aoFechar={() => setMensagem(null)} />
       <Mensagem texto={erroDisciplinas || erro} tipo="erro" />

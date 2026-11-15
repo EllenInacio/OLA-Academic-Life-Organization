@@ -139,7 +139,7 @@ export default function DisciplinasPage() {
   return (
     <Pagina
       titulo="Gestão de disciplinas"
-      subtitulo="Organize as matérias do semestre — elas são a base do calendário e do dashboard"
+      subtitulo="Cadastre as disciplinas do semestre e mantenha suas informações organizadas para acompanhar o calendário e seu desempenho acadêmico."
     >
       <Mensagem texto={mensagem?.texto} tipo={mensagem?.tipo} aoFechar={() => setMensagem(null)} />
       <Mensagem texto={erroDisciplinas} tipo="erro" />
