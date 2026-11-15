@@ -14,10 +14,45 @@ export const SITUACAO_NOTA = {
 
 export const SITUACAO_FREQUENCIA = {
   SEM_REGISTROS: { rotulo: "Sem registros", classe: "neutra" },
+  SEM_LIMITE: { rotulo: "Limite de faltas não definido", classe: "neutra" },
   DENTRO_DO_LIMITE: { rotulo: "Dentro do limite", classe: "boa" },
   PERTO_DO_LIMITE: { rotulo: "Perto do limite", classe: "atencao" },
   ACIMA_DO_LIMITE: { rotulo: "Limite ultrapassado", classe: "critica" },
 };
+
+export function estadoDaMedia(desempenho) {
+  if (desempenho.media === null) {
+    return { final: false, rotulo: "Média geral", curto: "sem notas", detalhe: "Nenhuma nota lançada ainda." };
+  }
+
+  if (desempenho.final) {
+    return {
+      final: true,
+      rotulo: "Média final geral",
+      curto: "média final",
+      detalhe: "Média final: a M1 e a M2 estão com todas as notas lançadas.",
+    };
+  }
+
+  const comNota = desempenho.etapas.filter((etapa) => etapa.media !== null).map((etapa) => etapa.etapa);
+  const semNota = desempenho.etapas.filter((etapa) => etapa.media === null).map((etapa) => etapa.etapa);
+
+  if (semNota.length > 0) {
+    return {
+      final: false,
+      rotulo: "Média geral parcial",
+      curto: `média parcial, só ${comNota.join(" e ")}`,
+      detalhe: `Resultado provisório: a ${semNota.join(" e a ")} ainda não possui notas, então a média geral considera só a ${comNota.join(" e a ")}.`,
+    };
+  }
+
+  return {
+    final: false,
+    rotulo: "Média geral parcial",
+    curto: "média parcial, faltam notas",
+    detalhe: "Resultado provisório: a M1 e a M2 já têm notas, mas ainda há avaliações sem nota lançada.",
+  };
+}
 
 export function rotuloRegra(valor, curto = false) {
   const regra = REGRAS_MEDIA.find((item) => item.valor === valor);

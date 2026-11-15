@@ -5,7 +5,6 @@ import "./SeletorHorario.css";
 const HORAS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
 const MINUTOS = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, "0"));
 
-// Selects em vez de <input type="time">: o formato 24 h não depende do idioma do navegador.
 function Hora({ rotulo, valor, aoMudar }) {
   const [hora, minuto] = valor.split(":");
   const minutos = MINUTOS.includes(minuto) ? MINUTOS : [...MINUTOS, minuto].sort();
@@ -35,7 +34,6 @@ export default function SeletorHorario({ valor, aoMudar }) {
   const [selecao, setSelecao] = useState(() => lerHorario(valor) ?? {});
   const textoAntigo = valor && lerHorario(valor) === null ? valor : "";
 
-  // Quando o formulário troca de disciplina ou é limpo, o valor muda por fora.
   useEffect(() => {
     if (montarHorario(selecao) !== valor) setSelecao(lerHorario(valor) ?? {});
   }, [valor]);

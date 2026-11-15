@@ -10,7 +10,6 @@ function classeDoPrazo(dias) {
 }
 
 export default function EventoResumo({ evento, mostrarDisciplina = true, mostrarStatus = false }) {
-  // Para evento concluído o prazo não importa mais: mostra só a data.
   const dias = evento.status === "CONCLUIDO" ? null : evento.diasRestantes;
   const data = formatarData(evento.data);
 

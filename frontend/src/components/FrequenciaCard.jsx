@@ -5,23 +5,36 @@ import { SITUACAO_FREQUENCIA } from "../constants/desempenho";
 import { formatarData, formatarPercentual, hojeISO, plural } from "../utils/formatacao";
 
 const MAXIMO_AULAS = 12;
+const MAXIMO_FALTAS = 1000;
 
-/** Quanto do limite de faltas já foi usado (0 a 100), para a barra. */
+function faltasValidas(valor) {
+  return Number.isInteger(valor) && valor >= 0 && valor <= MAXIMO_FALTAS;
+}
+
+export function textoFaltasEmAulas(frequencia) {
+  const faltas = plural(frequencia.faltas, "falta", "faltas");
+  return frequencia.base === "TOTAL_DA_DISCIPLINA"
+    ? `${faltas} em ${plural(frequencia.totalAulas, "aula da disciplina", "aulas da disciplina")}`
+    : `${faltas} em ${plural(frequencia.aulasRegistradas, "aula registrada", "aulas registradas")}`;
+}
+
 export function usoDoLimite(frequencia) {
-  if (frequencia.faltasPermitidas !== null) {
-    if (frequencia.faltasPermitidas === 0) return frequencia.faltas > 0 ? 100 : 0;
-    return Math.min(100, (frequencia.faltas / frequencia.faltasPermitidas) * 100);
-  }
-  if (frequencia.percentualFaltas === null) return 0;
-  return Math.min(100, (frequencia.percentualFaltas / frequencia.limiteFaltas) * 100);
+  if (frequencia.faltasPermitidas === null) return 0;
+  if (frequencia.faltasPermitidas === 0) return frequencia.faltas > 0 ? 100 : 0;
+  return Math.min(100, (frequencia.faltas / frequencia.faltasPermitidas) * 100);
+}
+
+export function textoLimite(frequencia) {
+  return frequencia.limiteFaltas === null
+    ? "Limite de faltas não definido"
+    : `Limite de reprovação: ${plural(frequencia.limiteFaltas, "falta", "faltas")}`;
 }
 
 export function BarraFrequencia({ frequencia }) {
+  if (frequencia.faltasPermitidas === null) return null;
+
   const uso = usoDoLimite(frequencia);
-  const descricao =
-    frequencia.faltasPermitidas !== null
-      ? `${frequencia.faltas} de ${frequencia.faltasPermitidas} faltas permitidas`
-      : `${formatarPercentual(frequencia.percentualFaltas ?? 0)} de faltas; limite de ${formatarPercentual(frequencia.limiteFaltas)}`;
+  const descricao = `${frequencia.faltas} de ${frequencia.faltasPermitidas} faltas permitidas`;
 
   return (
     <div
@@ -54,8 +67,8 @@ function RegistrarAula({ aoRegistrar }) {
     if (!Number.isInteger(quantidadeAulas) || quantidadeAulas < 1 || quantidadeAulas > MAXIMO_AULAS) {
       return setErro(`A quantidade de aulas deve ser um número inteiro entre 1 e ${MAXIMO_AULAS}.`);
     }
-    if (!Number.isInteger(quantidadeFaltas) || quantidadeFaltas < 0 || quantidadeFaltas > quantidadeAulas) {
-      return setErro("As faltas devem ser um número inteiro de 0 até a quantidade de aulas do dia.");
+    if (!faltasValidas(quantidadeFaltas)) {
+      return setErro("As faltas devem ser um número inteiro, de 0 em diante (sem números negativos ou quebrados).");
     }
 
     setErro("");
@@ -92,7 +105,6 @@ function RegistrarAula({ aoRegistrar }) {
             id="freq-faltas"
             type="number"
             min="0"
-            max={aulas || MAXIMO_AULAS}
             step="1"
             value={faltas}
             onChange={(e) => setFaltas(e.target.value)}
@@ -105,8 +117,8 @@ function RegistrarAula({ aoRegistrar }) {
         </button>
       </div>
       <p className="cartao-dica">
-        Um registro por dia de aula. Informe quantas aulas houve e em quantas você faltou (0 se esteve presente).
-        Ex.: 4 aulas no dia e falta só no segundo período = 2 faltas.
+        Um registro por dia de aula. Conte as faltas na mesma unidade do total de aulas da disciplina
+        (horas-aula): se você perdeu 4 aulas no mesmo dia, informe 4 faltas. Use 0 se esteve presente.
       </p>
     </div>
   );
@@ -135,8 +147,8 @@ function LinhaHistorico({ registro, aoSalvar, aoExcluir }) {
     if (!Number.isInteger(quantidadeAulas) || quantidadeAulas < 1 || quantidadeAulas > MAXIMO_AULAS) {
       return setErro(`Aulas: inteiro entre 1 e ${MAXIMO_AULAS}.`);
     }
-    if (!Number.isInteger(faltas) || faltas < 0 || faltas > quantidadeAulas) {
-      return setErro("Faltas: de 0 até a quantidade de aulas.");
+    if (!faltasValidas(faltas)) {
+      return setErro("Faltas: número inteiro, de 0 em diante.");
     }
 
     const salvou = await aoSalvar(registro, { data: campos.data, quantidadeAulas, faltas });
@@ -170,7 +182,7 @@ function LinhaHistorico({ registro, aoSalvar, aoExcluir }) {
             type="number"
             aria-label="Faltas"
             min="0"
-            max={campos.quantidadeAulas}
+            step="1"
             value={campos.faltas}
             onChange={(e) => setCampos({ ...campos, faltas: e.target.value })}
           />
@@ -214,13 +226,13 @@ function QuantoPodeFaltar({ disciplina, frequencia }) {
   if (frequencia.faltasPermitidas === null) {
     return (
       <p>
-        Cadastre a carga horária da disciplina para saber quantas faltas ainda são permitidas no semestre.{" "}
-        <Link to={`/disciplinas?editar=${disciplina.id}`}>Informar carga horária</Link>
+        Cadastre o limite de faltas da disciplina para saber quantas faltas ainda são permitidas no semestre.{" "}
+        <Link to={`/disciplinas?editar=${disciplina.id}`}>Informar limite de faltas</Link>
       </p>
     );
   }
 
-  const base = `Considerando ${disciplina.cargaHoraria}h de carga horária (${frequencia.aulasPrevistas} aulas, 1 por hora), o limite de ${formatarPercentual(frequencia.limiteFaltas)} permite ${plural(frequencia.faltasPermitidas, "falta", "faltas")}`;
+  const base = `O limite cadastrado para a disciplina é de ${plural(frequencia.faltasPermitidas, "falta", "faltas")}`;
 
   if (frequencia.faltasRestantes < 0) {
     return (
@@ -229,7 +241,6 @@ function QuantoPodeFaltar({ disciplina, frequencia }) {
       </p>
     );
   }
-
   return (
     <p>
       {base}: restam <strong>{plural(frequencia.faltasRestantes, "falta", "faltas")}</strong> antes de reprovar
@@ -246,14 +257,33 @@ export default function FrequenciaCard({ disciplina, registros, aoRegistrar, aoA
       <header className="cartao-academico-topo">
         <div>
           <h2 id="titulo-frequencia">Frequência</h2>
-          <p>Limite de reprovação: {formatarPercentual(frequencia.limiteFaltas)} de faltas</p>
+          <p>{textoLimite(frequencia)}</p>
         </div>
         <div className="destaque-numero">
-          <span>Faltas (parcial)</span>
-          <strong>{frequencia.percentualFaltas === null ? "—" : formatarPercentual(frequencia.percentualFaltas)}</strong>
+          <span>{frequencia.base === "TOTAL_DA_DISCIPLINA" ? "Frequência" : "Frequência (parcial)"}</span>
+          <strong>
+            {frequencia.percentualPresenca === null ? "—" : formatarPercentual(frequencia.percentualPresenca)}
+          </strong>
           <Selo situacao={frequencia.situacao} mapa={SITUACAO_FREQUENCIA} />
         </div>
       </header>
+
+      <p className="cartao-dica">
+        {frequencia.aulasPrevistas !== null ? (
+          <>
+            Total de aulas da disciplina: <strong>{frequencia.aulasPrevistas}</strong> (carga horária calculada
+            pelos dias, horários e datas das aulas).{" "}
+            <Link to={`/disciplinas?editar=${disciplina.id}`}>Alterar dias e horários</Link>
+          </>
+        ) : (
+          <>
+            Informe os dias, os horários e as datas das aulas no cadastro da disciplina: o sistema calcula o total
+            de aulas e a frequência do período todo. Sem isso, o percentual é parcial e usa só as aulas
+            registradas.{" "}
+            <Link to={`/disciplinas?editar=${disciplina.id}`}>Informar dias e horários</Link>
+          </>
+        )}
+      </p>
 
       {frequencia.aulasRegistradas === 0 ? (
         <p className="aviso-vazio">Nenhuma aula registrada ainda. O percentual aparece depois do primeiro registro.</p>
@@ -261,20 +291,28 @@ export default function FrequenciaCard({ disciplina, registros, aoRegistrar, aoA
         <>
           <BarraFrequencia frequencia={frequencia} />
           <p className="cartao-dica">
-            {plural(frequencia.faltas, "falta", "faltas")} em {plural(frequencia.aulasRegistradas, "aula registrada", "aulas registradas")}
+            {textoFaltasEmAulas(frequencia)} = {formatarPercentual(frequencia.percentualFaltas)} de faltas
             {frequencia.faltasPermitidas !== null &&
               ` · ${frequencia.faltas} de ${frequencia.faltasPermitidas} faltas permitidas`}
           </p>
+          {frequencia.faltasAcimaDoTotal && (
+            <p className="texto-critico">
+              Inconsistência: as faltas registradas ({frequencia.faltas}) passam do total de aulas (
+              {frequencia.totalAulas}). O registro foi mantido e a frequência aparece como 0%. Confira os dias,
+              horários e datas das aulas da disciplina ou os registros de faltas.
+            </p>
+          )}
           {frequencia.ritmoAcimaDoLimite && frequencia.situacao !== "ACIMA_DO_LIMITE" && (
             <p className="texto-atencao">
-              No ritmo atual ({formatarPercentual(frequencia.percentualFaltas)} das aulas registradas), você passaria do
-              limite de {formatarPercentual(frequencia.limiteFaltas)} até o fim do semestre. É uma estimativa.
+              No ritmo atual ({frequencia.faltas} faltas em {frequencia.aulasRegistradas} aulas registradas), você
+              passaria do limite de {plural(frequencia.faltasPermitidas, "falta", "faltas")} até o fim do semestre. É
+              uma estimativa.
             </p>
           )}
           {frequencia.registrosAcimaDoPrevisto && (
             <p className="texto-atencao">
               Há mais aulas registradas ({frequencia.aulasRegistradas}) do que a carga horária prevê (
-              {frequencia.aulasPrevistas}). Confira a carga horária ou os registros.
+              {frequencia.aulasPrevistas}). Confira os dias, horários e datas das aulas ou os registros.
             </p>
           )}
         </>

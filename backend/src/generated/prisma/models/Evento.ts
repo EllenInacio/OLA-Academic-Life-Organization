@@ -46,6 +46,7 @@ export type EventoMinAggregateOutputType = {
   id: number | null
   titulo: string | null
   tipo: $Enums.TipoEvento | null
+  etapa: $Enums.EtapaAvaliacao | null
   data: Date | null
   peso: runtime.Decimal | null
   status: $Enums.StatusEvento | null
@@ -60,6 +61,7 @@ export type EventoMaxAggregateOutputType = {
   id: number | null
   titulo: string | null
   tipo: $Enums.TipoEvento | null
+  etapa: $Enums.EtapaAvaliacao | null
   data: Date | null
   peso: runtime.Decimal | null
   status: $Enums.StatusEvento | null
@@ -74,6 +76,7 @@ export type EventoCountAggregateOutputType = {
   id: number
   titulo: number
   tipo: number
+  etapa: number
   data: number
   peso: number
   status: number
@@ -106,6 +109,7 @@ export type EventoMinAggregateInputType = {
   id?: true
   titulo?: true
   tipo?: true
+  etapa?: true
   data?: true
   peso?: true
   status?: true
@@ -120,6 +124,7 @@ export type EventoMaxAggregateInputType = {
   id?: true
   titulo?: true
   tipo?: true
+  etapa?: true
   data?: true
   peso?: true
   status?: true
@@ -134,6 +139,7 @@ export type EventoCountAggregateInputType = {
   id?: true
   titulo?: true
   tipo?: true
+  etapa?: true
   data?: true
   peso?: true
   status?: true
@@ -235,6 +241,7 @@ export type EventoGroupByOutputType = {
   id: number
   titulo: string
   tipo: $Enums.TipoEvento
+  etapa: $Enums.EtapaAvaliacao
   data: Date
   peso: runtime.Decimal
   status: $Enums.StatusEvento
@@ -272,6 +279,7 @@ export type EventoWhereInput = {
   id?: Prisma.IntFilter<"Evento"> | number
   titulo?: Prisma.StringFilter<"Evento"> | string
   tipo?: Prisma.EnumTipoEventoFilter<"Evento"> | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoFilter<"Evento"> | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeFilter<"Evento"> | Date | string
   peso?: Prisma.DecimalFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFilter<"Evento"> | $Enums.StatusEvento
@@ -287,6 +295,7 @@ export type EventoOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   titulo?: Prisma.SortOrder
   tipo?: Prisma.SortOrder
+  etapa?: Prisma.SortOrder
   data?: Prisma.SortOrder
   peso?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -305,6 +314,7 @@ export type EventoWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.EventoWhereInput | Prisma.EventoWhereInput[]
   titulo?: Prisma.StringFilter<"Evento"> | string
   tipo?: Prisma.EnumTipoEventoFilter<"Evento"> | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoFilter<"Evento"> | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeFilter<"Evento"> | Date | string
   peso?: Prisma.DecimalFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFilter<"Evento"> | $Enums.StatusEvento
@@ -320,6 +330,7 @@ export type EventoOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   titulo?: Prisma.SortOrder
   tipo?: Prisma.SortOrder
+  etapa?: Prisma.SortOrder
   data?: Prisma.SortOrder
   peso?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -342,6 +353,7 @@ export type EventoScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Evento"> | number
   titulo?: Prisma.StringWithAggregatesFilter<"Evento"> | string
   tipo?: Prisma.EnumTipoEventoWithAggregatesFilter<"Evento"> | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoWithAggregatesFilter<"Evento"> | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeWithAggregatesFilter<"Evento"> | Date | string
   peso?: Prisma.DecimalWithAggregatesFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoWithAggregatesFilter<"Evento"> | $Enums.StatusEvento
@@ -355,6 +367,7 @@ export type EventoScalarWhereWithAggregatesInput = {
 export type EventoCreateInput = {
   titulo: string
   tipo: $Enums.TipoEvento
+  etapa?: $Enums.EtapaAvaliacao
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
@@ -369,6 +382,7 @@ export type EventoUncheckedCreateInput = {
   id?: number
   titulo: string
   tipo: $Enums.TipoEvento
+  etapa?: $Enums.EtapaAvaliacao
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
@@ -382,6 +396,7 @@ export type EventoUncheckedCreateInput = {
 export type EventoUpdateInput = {
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   tipo?: Prisma.EnumTipoEventoFieldUpdateOperationsInput | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoFieldUpdateOperationsInput | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
@@ -396,6 +411,7 @@ export type EventoUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   tipo?: Prisma.EnumTipoEventoFieldUpdateOperationsInput | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoFieldUpdateOperationsInput | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
@@ -410,6 +426,7 @@ export type EventoCreateManyInput = {
   id?: number
   titulo: string
   tipo: $Enums.TipoEvento
+  etapa?: $Enums.EtapaAvaliacao
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
@@ -423,6 +440,7 @@ export type EventoCreateManyInput = {
 export type EventoUpdateManyMutationInput = {
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   tipo?: Prisma.EnumTipoEventoFieldUpdateOperationsInput | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoFieldUpdateOperationsInput | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
@@ -436,6 +454,7 @@ export type EventoUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   tipo?: Prisma.EnumTipoEventoFieldUpdateOperationsInput | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoFieldUpdateOperationsInput | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
@@ -460,6 +479,7 @@ export type EventoCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   titulo?: Prisma.SortOrder
   tipo?: Prisma.SortOrder
+  etapa?: Prisma.SortOrder
   data?: Prisma.SortOrder
   peso?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -482,6 +502,7 @@ export type EventoMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   titulo?: Prisma.SortOrder
   tipo?: Prisma.SortOrder
+  etapa?: Prisma.SortOrder
   data?: Prisma.SortOrder
   peso?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -496,6 +517,7 @@ export type EventoMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   titulo?: Prisma.SortOrder
   tipo?: Prisma.SortOrder
+  etapa?: Prisma.SortOrder
   data?: Prisma.SortOrder
   peso?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -560,6 +582,10 @@ export type EnumTipoEventoFieldUpdateOperationsInput = {
   set?: $Enums.TipoEvento
 }
 
+export type EnumEtapaAvaliacaoFieldUpdateOperationsInput = {
+  set?: $Enums.EtapaAvaliacao
+}
+
 export type EnumStatusEventoFieldUpdateOperationsInput = {
   set?: $Enums.StatusEvento
 }
@@ -567,6 +593,7 @@ export type EnumStatusEventoFieldUpdateOperationsInput = {
 export type EventoCreateWithoutDisciplinaInput = {
   titulo: string
   tipo: $Enums.TipoEvento
+  etapa?: $Enums.EtapaAvaliacao
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
@@ -580,6 +607,7 @@ export type EventoUncheckedCreateWithoutDisciplinaInput = {
   id?: number
   titulo: string
   tipo: $Enums.TipoEvento
+  etapa?: $Enums.EtapaAvaliacao
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
@@ -622,6 +650,7 @@ export type EventoScalarWhereInput = {
   id?: Prisma.IntFilter<"Evento"> | number
   titulo?: Prisma.StringFilter<"Evento"> | string
   tipo?: Prisma.EnumTipoEventoFilter<"Evento"> | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoFilter<"Evento"> | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeFilter<"Evento"> | Date | string
   peso?: Prisma.DecimalFilter<"Evento"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFilter<"Evento"> | $Enums.StatusEvento
@@ -636,6 +665,7 @@ export type EventoCreateManyDisciplinaInput = {
   id?: number
   titulo: string
   tipo: $Enums.TipoEvento
+  etapa?: $Enums.EtapaAvaliacao
   data: Date | string
   peso: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StatusEvento
@@ -648,6 +678,7 @@ export type EventoCreateManyDisciplinaInput = {
 export type EventoUpdateWithoutDisciplinaInput = {
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   tipo?: Prisma.EnumTipoEventoFieldUpdateOperationsInput | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoFieldUpdateOperationsInput | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
@@ -661,6 +692,7 @@ export type EventoUncheckedUpdateWithoutDisciplinaInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   tipo?: Prisma.EnumTipoEventoFieldUpdateOperationsInput | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoFieldUpdateOperationsInput | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
@@ -674,6 +706,7 @@ export type EventoUncheckedUpdateManyWithoutDisciplinaInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   titulo?: Prisma.StringFieldUpdateOperationsInput | string
   tipo?: Prisma.EnumTipoEventoFieldUpdateOperationsInput | $Enums.TipoEvento
+  etapa?: Prisma.EnumEtapaAvaliacaoFieldUpdateOperationsInput | $Enums.EtapaAvaliacao
   data?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peso?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStatusEventoFieldUpdateOperationsInput | $Enums.StatusEvento
@@ -689,6 +722,7 @@ export type EventoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   id?: boolean
   titulo?: boolean
   tipo?: boolean
+  etapa?: boolean
   data?: boolean
   peso?: boolean
   status?: boolean
@@ -704,6 +738,7 @@ export type EventoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   id?: boolean
   titulo?: boolean
   tipo?: boolean
+  etapa?: boolean
   data?: boolean
   peso?: boolean
   status?: boolean
@@ -719,6 +754,7 @@ export type EventoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   id?: boolean
   titulo?: boolean
   tipo?: boolean
+  etapa?: boolean
   data?: boolean
   peso?: boolean
   status?: boolean
@@ -734,6 +770,7 @@ export type EventoSelectScalar = {
   id?: boolean
   titulo?: boolean
   tipo?: boolean
+  etapa?: boolean
   data?: boolean
   peso?: boolean
   status?: boolean
@@ -744,7 +781,7 @@ export type EventoSelectScalar = {
   atualizadoEm?: boolean
 }
 
-export type EventoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titulo" | "tipo" | "data" | "peso" | "status" | "nota" | "notaMaxima" | "disciplinaId" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["evento"]>
+export type EventoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "titulo" | "tipo" | "etapa" | "data" | "peso" | "status" | "nota" | "notaMaxima" | "disciplinaId" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["evento"]>
 export type EventoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   disciplina?: boolean | Prisma.DisciplinaDefaultArgs<ExtArgs>
 }
@@ -764,6 +801,7 @@ export type $EventoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     id: number
     titulo: string
     tipo: $Enums.TipoEvento
+    etapa: $Enums.EtapaAvaliacao
     data: Date
     peso: runtime.Decimal
     status: $Enums.StatusEvento
@@ -1199,6 +1237,7 @@ export interface EventoFieldRefs {
   readonly id: Prisma.FieldRef<"Evento", 'Int'>
   readonly titulo: Prisma.FieldRef<"Evento", 'String'>
   readonly tipo: Prisma.FieldRef<"Evento", 'TipoEvento'>
+  readonly etapa: Prisma.FieldRef<"Evento", 'EtapaAvaliacao'>
   readonly data: Prisma.FieldRef<"Evento", 'DateTime'>
   readonly peso: Prisma.FieldRef<"Evento", 'Decimal'>
   readonly status: Prisma.FieldRef<"Evento", 'StatusEvento'>

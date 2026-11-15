@@ -166,7 +166,6 @@
   color: #065f46;
 }
 
-/* No Dashboard o calendário fica dentro de um bloco que já tem borda e espaçamento. */
 .painel-bloco .calendario {
   border: none;
   padding: 0;

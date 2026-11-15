@@ -61,7 +61,6 @@
   margin-bottom: 8px;
 }
 
-/* Pontos de atenção */
 .alertas {
   list-style: none;
   display: flex;
@@ -107,7 +106,6 @@
   font-weight: 600;
 }
 
-/* Gráfico: andamento por disciplina */
 .grafico-legenda {
   list-style: none;
   display: flex;
@@ -183,7 +181,6 @@
   background: #d6d2df;
 }
 
-/* Média por disciplina */
 .medias,
 .frequencias {
   list-style: none;
@@ -232,7 +229,6 @@
   font-weight: 600;
 }
 
-/* Frequência por disciplina */
 .frequencia-item {
   padding-bottom: 10px;
   border-bottom: 1px solid #f0edf6;

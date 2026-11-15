@@ -25,6 +25,7 @@ export function criar(dados: DadosEvento) {
     data: {
       titulo: dados.titulo,
       tipo: dados.tipo,
+      etapa: dados.etapa,
       data: new Date(dados.data),
       peso: dados.peso,
       status: dados.status,
@@ -42,6 +43,7 @@ export function atualizar(id: number, dados: DadosEvento) {
     data: {
       titulo: dados.titulo,
       tipo: dados.tipo,
+      etapa: dados.etapa,
       data: new Date(dados.data),
       peso: dados.peso,
       status: dados.status,

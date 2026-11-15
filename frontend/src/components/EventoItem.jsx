@@ -13,6 +13,7 @@ export default function EventoItem({ evento, aoEditar, aoExcluir }) {
             {rotuloDe(STATUS_EVENTO, evento.status)}
           </span>
           <span className="tag tag-peso">Peso {Number(evento.peso)}</span>
+          {Number(evento.peso) > 0 && evento.etapa && <span className="tag tag-peso">{evento.etapa}</span>}
         </div>
       </div>
 

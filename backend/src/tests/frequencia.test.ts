@@ -4,6 +4,7 @@ import { prisma } from "../config/prisma";
 import { limparBanco } from "./banco";
 import { criarUsuarioDeTeste } from "./usuarioDeTeste";
 import { dataRelativa } from "./datas";
+import { AULAS_4H, AULAS_72H, AULAS_80H } from "./aulas";
 
 let autorizacao: Record<string, string>;
 let disciplinaId: number;
@@ -19,7 +20,7 @@ describe("Frequência", () => {
     const disciplina = await request(app)
       .post("/api/disciplinas")
       .set(autorizacao)
-      .send({ nome: "Cálculo I", cargaHoraria: 72 });
+      .send({ nome: "Cálculo I", ...AULAS_72H, limiteFaltas: 18 });
     disciplinaId = disciplina.body.id;
   });
 
@@ -56,9 +57,12 @@ describe("Frequência", () => {
     const resposta = await request(app).get(`/api/disciplinas/${disciplinaId}`).set(autorizacao);
 
     expect(resposta.body.resumo.frequencia).toMatchObject({
+      base: "TOTAL_DA_DISCIPLINA",
+      totalAulas: 72,
       aulasRegistradas: 4,
       faltas: 1,
-      percentualFaltas: 25,
+      percentualFaltas: 1.39,
+      percentualPresenca: 98.61,
       aulasPrevistas: 72,
       faltasPermitidas: 18,
       faltasRestantes: 17,
@@ -83,8 +87,10 @@ describe("Frequência", () => {
   });
 
   it.each([
-    [{ data: dataRelativa(-1), quantidadeAulas: 2, faltas: 3 }, "maior que a quantidade de aulas"],
-    [{ data: dataRelativa(-1), faltas: 2 }, "maior que a quantidade de aulas"],
+    [{ data: dataRelativa(-1), faltas: -1 }, "número de faltas"],
+    [{ data: dataRelativa(-1), faltas: 1.5 }, "número de faltas"],
+    [{ data: dataRelativa(-1), faltas: "duas" }, "número de faltas"],
+    [{ data: dataRelativa(-1), faltas: 1001 }, "número de faltas"],
     [{ data: dataRelativa(-1), quantidadeAulas: 0, faltas: 0 }, "quantidade de aulas"],
     [{ data: dataRelativa(-1) }, "número de faltas"],
     [{ data: "14/10/2026", faltas: 0 }, "AAAA-MM-DD"],
@@ -94,6 +100,55 @@ describe("Frequência", () => {
 
     expect(resposta.status).toBe(400);
     expect(resposta.body.erro).toContain(trecho);
+  });
+
+  it("aceita várias faltas no mesmo dia, sem limitar pelas aulas do dia", async () => {
+    const semAulas = await registrar({ data: dataRelativa(-2), faltas: 4 });
+    const maisQueAsAulas = await registrar({ data: dataRelativa(-1), quantidadeAulas: 2, faltas: 3 });
+
+    expect([semAulas.status, maisQueAsAulas.status]).toEqual([201, 201]);
+    expect(semAulas.body).toMatchObject({ quantidadeAulas: 1, faltas: 4 });
+
+    const resposta = await request(app).get(`/api/disciplinas/${disciplinaId}`).set(autorizacao);
+    expect(resposta.body.resumo.frequencia).toMatchObject({
+      faltas: 7,
+      percentualFaltas: 9.72,
+      percentualPresenca: 90.28,
+      faltasAcimaDoTotal: false,
+      faltasRestantes: 11,
+    });
+  });
+
+  it("faltas acima do total de aulas: registra, avisa a inconsistência e não fica negativo", async () => {
+    await request(app)
+      .put(`/api/disciplinas/${disciplinaId}`)
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", ...AULAS_4H, limiteFaltas: 18 });
+    const registro = await registrar({ data: dataRelativa(-1), faltas: 6 });
+
+    const resposta = await request(app).get(`/api/disciplinas/${disciplinaId}`).set(autorizacao);
+
+    expect(registro.status).toBe(201);
+    expect(resposta.body.resumo.frequencia).toMatchObject({
+      totalAulas: 4,
+      faltas: 6,
+      percentualFaltas: 100,
+      percentualPresenca: 0,
+      faltasAcimaDoTotal: true,
+    });
+  });
+
+  it("mudar os dias ou as datas das aulas recalcula o total e mantém os registros de faltas", async () => {
+    await registrar({ data: dataRelativa(-1), faltas: 8 });
+
+    await request(app)
+      .put(`/api/disciplinas/${disciplinaId}`)
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", ...AULAS_80H, limiteFaltas: 18 });
+    const resposta = await request(app).get(`/api/disciplinas/${disciplinaId}`).set(autorizacao);
+
+    expect(await prisma.registroFrequencia.count()).toBe(1);
+    expect(resposta.body.resumo.frequencia).toMatchObject({ totalAulas: 80, faltas: 8, percentualPresenca: 90 });
   });
 
   it("edita e exclui um registro", async () => {

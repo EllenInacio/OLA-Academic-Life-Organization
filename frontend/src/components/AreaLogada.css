@@ -116,7 +116,6 @@
   border-left: 1px solid var(--borda);
 }
 
-/* Cabeçalho e corpo de cada página (componente Pagina). */
 .pagina-cabecalho {
   background: var(--fundo-cabecalho);
   border-bottom: 1px solid var(--borda);

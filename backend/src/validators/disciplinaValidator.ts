@@ -1,10 +1,12 @@
 import { body, query } from "express-validator";
 import { idRules } from "./eventoValidator";
 import {
-  CARGA_HORARIA_MAXIMA,
   FORMATO_DATA_AULAS,
-  FORMATO_SEMESTRE,
+  LIMITE_FALTAS_MAXIMO,
+  PERIODO_NUMERO_MAXIMO,
+  PESO_ETAPA_MAXIMO,
   REGRAS_MEDIA,
+  TIPOS_PERIODO,
 } from "../types/disciplina";
 
 const MENSAGEM_DATA_AULAS = "As datas do período das aulas devem estar no formato AAAA-MM-DD.";
@@ -23,17 +25,19 @@ export const criarDisciplinaRules = [
     .isLength({ max: 120 })
     .withMessage("O nome do professor deve ter no máximo 120 caracteres."),
 
-  body("semestre")
-    .optional({ values: "falsy" })
-    .trim()
-    .matches(FORMATO_SEMESTRE)
-    .withMessage("Informe o semestre no formato AAAA.N (ex.: 2026.2)."),
-
-  body("cargaHoraria")
+  body("periodoTipo")
     .optional({ values: "null" })
-    .isInt({ min: 1, max: CARGA_HORARIA_MAXIMA })
+    .isIn(TIPOS_PERIODO)
+    .withMessage("Período acadêmico inválido. Escolha um semestre ou Exame/Recuperação.")
+    .bail()
+    .custom((tipo, { req }) => tipo !== "SEMESTRE" || (req.body.periodoNumero ?? null) !== null)
+    .withMessage("Informe qual é o semestre do período acadêmico."),
+
+  body("periodoNumero")
+    .optional({ values: "null" })
+    .isInt({ min: 1, max: PERIODO_NUMERO_MAXIMO })
     .withMessage(
-      `A carga horária deve ser um número inteiro de horas entre 1 e ${CARGA_HORARIA_MAXIMA}.`
+      `O semestre do período acadêmico deve ser um número inteiro entre 1 e ${PERIODO_NUMERO_MAXIMO}.`
     )
     .toInt(),
 
@@ -80,11 +84,19 @@ export const criarDisciplinaRules = [
     .withMessage("A média de aprovação deve ser um número entre 0 e 10.")
     .toFloat(),
 
-  body("limiteFaltas")
+  body(["pesoM1", "pesoM2"])
     .optional()
-    .isFloat({ gt: 0, max: 100 })
-    .withMessage("O limite de faltas deve ser um percentual maior que 0 e até 100.")
+    .isFloat({ gt: 0, max: PESO_ETAPA_MAXIMO })
+    .withMessage(`O peso da M1 e o peso da M2 devem ser números maiores que 0 e até ${PESO_ETAPA_MAXIMO}.`)
     .toFloat(),
+
+  body("limiteFaltas")
+    .optional({ values: "null" })
+    .isInt({ min: 0, max: LIMITE_FALTAS_MAXIMO })
+    .withMessage(
+      `O limite de faltas deve ser a quantidade de faltas permitidas: um número inteiro entre 0 e ${LIMITE_FALTAS_MAXIMO}.`
+    )
+    .toInt(),
 ];
 
 export const atualizarDisciplinaRules = [...idRules, ...criarDisciplinaRules];

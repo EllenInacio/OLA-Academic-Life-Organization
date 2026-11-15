@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { TIPOS_EVENTO, STATUS_EVENTO } from "../constants/evento";
+import { ETAPAS, ETAPA_PADRAO, TIPOS_EVENTO, STATUS_EVENTO } from "../constants/evento";
 
 const FORMULARIO_VAZIO = {
   titulo: "",
   tipo: "PROVA",
+  etapa: ETAPA_PADRAO,
   data: "",
   peso: "1",
   status: "PENDENTE",
@@ -25,6 +26,7 @@ export default function EventoForm({
       setCampos({
         titulo: eventoEmEdicao.titulo,
         tipo: eventoEmEdicao.tipo,
+        etapa: eventoEmEdicao.etapa ?? ETAPA_PADRAO,
         data: eventoEmEdicao.data.slice(0, 10),
         peso: String(Number(eventoEmEdicao.peso)),
         status: eventoEmEdicao.status,
@@ -65,6 +67,7 @@ export default function EventoForm({
     const salvou = await aoSalvar({
       titulo: campos.titulo.trim(),
       tipo: campos.tipo,
+      etapa: campos.etapa,
       data: campos.data,
       peso: Number(campos.peso),
       status: campos.status,
@@ -164,6 +167,17 @@ export default function EventoForm({
             ))}
           </select>
         </div>
+      </div>
+
+      <div className="campo">
+        <label htmlFor="evento-etapa">Etapa da nota (M1 ou M2)</label>
+        <select id="evento-etapa" value={campos.etapa} onChange={(e) => alterar("etapa", e.target.value)}>
+          {ETAPAS.map((etapa) => (
+            <option key={etapa.valor} value={etapa.valor}>
+              {etapa.rotulo}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="acoes-formulario">

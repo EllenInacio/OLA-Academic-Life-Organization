@@ -12,7 +12,6 @@ export const HORARIO_PADRAO = { inicio: "19:00", fim: "22:00" };
 
 const FORMATO_DIA = /^(Seg|Ter|Qua|Qui|Sex|Sáb|Dom) (\d{2}:\d{2})–(\d{2}:\d{2})$/;
 
-/** { Seg: { inicio: "19:00", fim: "22:00" } } -> "Seg 19:00–22:00" */
 export function montarHorario(selecao) {
   return DIAS_SEMANA.filter((dia) => selecao[dia.sigla])
     .map((dia) => `${dia.sigla} ${selecao[dia.sigla].inicio}–${selecao[dia.sigla].fim}`)

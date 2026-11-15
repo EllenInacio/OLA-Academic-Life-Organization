@@ -4,6 +4,7 @@ import { prisma } from "../config/prisma";
 import { limparBanco } from "./banco";
 import { criarUsuarioDeTeste } from "./usuarioDeTeste";
 import { dataRelativa } from "./datas";
+import { AULAS_72H, AULAS_80H } from "./aulas";
 
 let autorizacao: Record<string, string>;
 
@@ -73,21 +74,84 @@ describe("Disciplinas", () => {
     ]);
   });
 
-  it("cadastra semestre, carga horária e horário", async () => {
+  it("calcula a carga horária pelos dias, horários e datas das aulas", async () => {
     const resposta = await request(app).post("/api/disciplinas").set(autorizacao).send({
       nome: "Cálculo I",
       professor: "Helena Duarte",
-      semestre: "2026.2",
-      cargaHoraria: 72,
-      horario: "Seg e Qua · 08:00–09:40",
+      horario: "Seg 19:00–22:00, Qua 19:00–22:00",
+      inicioAulas: "2026-08-03",
+      fimAulas: "2026-12-18",
     });
 
     expect(resposta.status).toBe(201);
+    expect(resposta.body).not.toHaveProperty("semestre");
+    expect(resposta.body).not.toHaveProperty("duracaoAula");
+    expect(resposta.body).not.toHaveProperty("aulasDescontadas");
     expect(resposta.body).toMatchObject({
-      semestre: "2026.2",
-      cargaHoraria: 72,
-      horario: "Seg e Qua · 08:00–09:40",
+      cargaHoraria: 120,
+      horario: "Seg 19:00–22:00, Qua 19:00–22:00",
     });
+  });
+
+  it("ignora a carga horária enviada pelo usuário e usa a calculada", async () => {
+    const calculada = await request(app)
+      .post("/api/disciplinas")
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", ...AULAS_72H, cargaHoraria: 999 });
+    const semAulas = await request(app)
+      .post("/api/disciplinas")
+      .set(autorizacao)
+      .send({ nome: "Redes", cargaHoraria: 72 });
+
+    expect(calculada.body.cargaHoraria).toBe(72);
+    expect(semAulas.body.cargaHoraria).toBeNull();
+  });
+
+  it("fica sem carga horária quando faltam os dias, os horários ou as datas", async () => {
+    const enviar = (nome: string, campos: Record<string, unknown>) =>
+      request(app).post("/api/disciplinas").set(autorizacao).send({ nome, ...campos });
+
+    const semDatas = await enviar("A", { horario: AULAS_72H.horario });
+    const semHorario = await enviar("B", { inicioAulas: AULAS_72H.inicioAulas, fimAulas: AULAS_72H.fimAulas });
+    const soInicio = await enviar("C", { horario: AULAS_72H.horario, inicioAulas: AULAS_72H.inicioAulas });
+    const horarioLivre = await enviar("D", { ...AULAS_72H, horario: "Seg e Qua · 08:00–09:40" });
+
+    expect([semDatas, semHorario, soInicio, horarioLivre].map((r) => [r.status, r.body.cargaHoraria])).toEqual([
+      [201, null],
+      [201, null],
+      [201, null],
+      [201, null],
+    ]);
+    expect(horarioLivre.body.horario).toBe("Seg e Qua · 08:00–09:40");
+  });
+
+  it("recalcula a carga horária quando os dias, os horários ou as datas mudam", async () => {
+    const criada = await request(app).post("/api/disciplinas").set(autorizacao).send({ nome: "Cálculo I", ...AULAS_72H });
+    const editar = (campos: Record<string, unknown>) =>
+      request(app).put(`/api/disciplinas/${criada.body.id}`).set(autorizacao).send({ nome: "Cálculo I", ...campos });
+
+    const novaData = await editar(AULAS_80H);
+    const novoHorario = await editar({ ...AULAS_80H, horario: "Seg 19:00–22:00, Qua 19:00–22:00" });
+    const datasMantidas = await editar({ horario: AULAS_80H.horario });
+    const semHorario = await editar({});
+
+    expect(criada.body.cargaHoraria).toBe(72);
+    expect(novaData.body.cargaHoraria).toBe(80);
+    expect(novoHorario.body.cargaHoraria).toBe(117);
+    expect(datasMantidas.body.cargaHoraria).toBe(80);
+    expect(semHorario.body).toMatchObject({ horario: null, cargaHoraria: null });
+  });
+
+  it("recusa aulas que somam mais horas que o limite de carga horária", async () => {
+    const resposta = await request(app).post("/api/disciplinas").set(autorizacao).send({
+      nome: "Cálculo I",
+      horario: "Seg 00:00–23:59, Ter 00:00–23:59, Qua 00:00–23:59",
+      inicioAulas: "2026-01-01",
+      fimAulas: "2026-12-31",
+    });
+
+    expect(resposta.status).toBe(400);
+    expect(resposta.body.erro).toContain("carga horária calculada");
   });
 
   it("cadastra o período das aulas", async () => {
@@ -174,7 +238,6 @@ describe("Disciplinas", () => {
     const resposta = await request(app).post("/api/disciplinas").set(autorizacao).send({
       nome: "Redes",
       professor: "",
-      semestre: "",
       cargaHoraria: null,
       horario: "",
     });
@@ -182,17 +245,15 @@ describe("Disciplinas", () => {
     expect(resposta.status).toBe(201);
     expect(resposta.body).toMatchObject({
       professor: null,
-      semestre: null,
       cargaHoraria: null,
       horario: null,
     });
   });
 
-  it("usa critérios padrão (média ponderada, sem média de aprovação, 25% de faltas)", async () => {
+  it("usa critérios padrão (média ponderada, sem média de aprovação, sem limite de faltas)", async () => {
     const resposta = await request(app).post("/api/disciplinas").set(autorizacao).send({ nome: "Redes" });
 
-    expect(resposta.body).toMatchObject({ regraMedia: "PONDERADA", mediaAprovacao: null });
-    expect(Number(resposta.body.limiteFaltas)).toBe(25);
+    expect(resposta.body).toMatchObject({ regraMedia: "PONDERADA", mediaAprovacao: null, limiteFaltas: null });
   });
 
   it("salva e mantém os critérios de avaliação", async () => {
@@ -203,7 +264,6 @@ describe("Disciplinas", () => {
       limiteFaltas: 20,
     });
 
-    // Edição sem os critérios (ex.: cadastro rápido) mantém os valores salvos.
     const editada = await request(app)
       .put(`/api/disciplinas/${criada.body.id}`)
       .set(autorizacao)
@@ -211,21 +271,32 @@ describe("Disciplinas", () => {
 
     expect(editada.body.regraMedia).toBe("ARITMETICA");
     expect(Number(editada.body.mediaAprovacao)).toBe(6);
-    expect(Number(editada.body.limiteFaltas)).toBe(20);
+    expect(editada.body.limiteFaltas).toBe(20);
 
-    // null remove a média de aprovação.
-    const semMedia = await request(app)
+    const semCriterios = await request(app)
       .put(`/api/disciplinas/${criada.body.id}`)
       .set(autorizacao)
-      .send({ nome: "Cálculo I", mediaAprovacao: null });
-    expect(semMedia.body.mediaAprovacao).toBeNull();
+      .send({ nome: "Cálculo I", mediaAprovacao: null, limiteFaltas: null });
+    expect(semCriterios.body.mediaAprovacao).toBeNull();
+    expect(semCriterios.body.limiteFaltas).toBeNull();
+  });
+
+  it("aceita limite de zero faltas", async () => {
+    const resposta = await request(app)
+      .post("/api/disciplinas")
+      .set(autorizacao)
+      .send({ nome: "Estágio", limiteFaltas: 0 });
+
+    expect(resposta.status).toBe(201);
+    expect(resposta.body.limiteFaltas).toBe(0);
   });
 
   it.each([
     [{ regraMedia: "MEDIANA" }, "Regra da média"],
     [{ mediaAprovacao: 11 }, "média de aprovação"],
-    [{ limiteFaltas: 0 }, "limite de faltas"],
-    [{ limiteFaltas: 120 }, "limite de faltas"],
+    [{ limiteFaltas: -1 }, "limite de faltas"],
+    [{ limiteFaltas: 4.5 }, "limite de faltas"],
+    [{ limiteFaltas: 1001 }, "limite de faltas"],
   ])("recusa critério inválido %p", async (criterio, trecho) => {
     const resposta = await request(app)
       .post("/api/disciplinas")
@@ -237,7 +308,7 @@ describe("Disciplinas", () => {
   });
 
   it("informa média e frequência de cada disciplina na listagem", async () => {
-    const id = await criarDisciplina("Banco de Dados");
+    const id = await criarDisciplina("Banco de Dados", { limiteFaltas: 1 });
     await criarEvento(id, { titulo: "Prova 1", data: dataRelativa(-3) });
     const eventos = await prisma.evento.findMany();
     await request(app).put(`/api/eventos/${eventos[0].id}/nota`).set(autorizacao).send({ nota: 7.5 });
@@ -257,25 +328,88 @@ describe("Disciplinas", () => {
     });
   });
 
-  it("recusa semestre fora do formato AAAA.N", async () => {
+  it("usa peso 1 para a M1 e peso 2 para a M2 quando os pesos não são informados", async () => {
+    const resposta = await request(app).post("/api/disciplinas").set(autorizacao).send({ nome: "Redes" });
+
+    expect([Number(resposta.body.pesoM1), Number(resposta.body.pesoM2)]).toEqual([1, 2]);
+  });
+
+  it("cadastra o período acadêmico como semestre do curso ou como Exame/Recuperação", async () => {
+    const semestre = await request(app)
+      .post("/api/disciplinas")
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", periodoTipo: "SEMESTRE", periodoNumero: 2 });
+    const exame = await request(app)
+      .post("/api/disciplinas")
+      .set(autorizacao)
+      .send({ nome: "Física (exame)", periodoTipo: "EXAME", periodoNumero: 3 });
+    const semPeriodo = await request(app).post("/api/disciplinas").set(autorizacao).send({ nome: "Redes" });
+
+    expect(semestre.body).toMatchObject({ periodoTipo: "SEMESTRE", periodoNumero: 2 });
+    expect(exame.body).toMatchObject({ periodoTipo: "EXAME", periodoNumero: null });
+    expect(semPeriodo.body).toMatchObject({ periodoTipo: null, periodoNumero: null });
+  });
+
+  it("mantém o período acadêmico quando ele não é enviado na edição e limpa com null", async () => {
+    const criada = await request(app)
+      .post("/api/disciplinas")
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", periodoTipo: "SEMESTRE", periodoNumero: 8 });
+
+    const mantida = await request(app)
+      .put(`/api/disciplinas/${criada.body.id}`)
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", professor: "Helena" });
+    const limpa = await request(app)
+      .put(`/api/disciplinas/${criada.body.id}`)
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", periodoTipo: null });
+
+    expect(mantida.body).toMatchObject({ periodoTipo: "SEMESTRE", periodoNumero: 8 });
+    expect(limpa.body).toMatchObject({ periodoTipo: null, periodoNumero: null });
+  });
+
+  it.each([
+    [{ periodoTipo: "TRIMESTRE" }, "Período acadêmico inválido"],
+    [{ periodoTipo: "SEMESTRE" }, "qual é o semestre"],
+    [{ periodoTipo: "SEMESTRE", periodoNumero: 0 }, "entre 1 e 12"],
+    [{ periodoTipo: "SEMESTRE", periodoNumero: 13 }, "entre 1 e 12"],
+  ])("recusa período acadêmico inválido %p", async (campos, trecho) => {
     const resposta = await request(app)
       .post("/api/disciplinas")
       .set(autorizacao)
-      .send({ nome: "Cálculo I", semestre: "2º semestre" });
+      .send({ nome: "Cálculo I", ...campos });
 
     expect(resposta.status).toBe(400);
-    expect(resposta.body.erro).toContain("AAAA.N");
+    expect(resposta.body.erro).toContain(trecho);
   });
 
-  it.each([0, -10, 1001, 2.5, "abc"])("recusa carga horária inválida (%p)", async (cargaHoraria) => {
-    const resposta = await request(app)
+  it("salva e mantém os pesos da M1 e da M2", async () => {
+    const criada = await request(app)
       .post("/api/disciplinas")
       .set(autorizacao)
-      .send({ nome: "Cálculo I", cargaHoraria });
+      .send({ nome: "Cálculo I", pesoM1: 4, pesoM2: 6 });
 
-    expect(resposta.status).toBe(400);
-    expect(resposta.body.erro).toContain("carga horária");
+    const editada = await request(app)
+      .put(`/api/disciplinas/${criada.body.id}`)
+      .set(autorizacao)
+      .send({ nome: "Cálculo I", professor: "Helena" });
+
+    expect([Number(editada.body.pesoM1), Number(editada.body.pesoM2)]).toEqual([4, 6]);
   });
+
+  it.each([{ pesoM1: 0 }, { pesoM2: -1 }, { pesoM1: 101 }, { pesoM2: "abc" }])(
+    "recusa peso de etapa inválido %p",
+    async (pesos) => {
+      const resposta = await request(app)
+        .post("/api/disciplinas")
+        .set(autorizacao)
+        .send({ nome: "Cálculo I", ...pesos });
+
+      expect(resposta.status).toBe(400);
+      expect(resposta.body.erro).toContain("peso da M1 e o peso da M2");
+    }
+  );
 
   it("informa o total de eventos de cada disciplina na listagem", async () => {
     const id = await criarDisciplina("Banco de Dados");
@@ -329,8 +463,7 @@ describe("Disciplinas", () => {
     const resposta = await request(app).put(`/api/disciplinas/${id}`).set(autorizacao).send({
       nome: "Cálculo I",
       professor: "Helena Duarte",
-      semestre: "2026.2",
-      cargaHoraria: 72,
+      ...AULAS_72H,
     });
 
     expect(resposta.status).toBe(200);
@@ -339,7 +472,7 @@ describe("Disciplinas", () => {
       nome: "Cálculo I",
       professor: "Helena Duarte",
       cargaHoraria: 72,
-      horario: null,
+      horario: AULAS_72H.horario,
     });
   });
 
@@ -412,8 +545,8 @@ describe("Disciplinas", () => {
   });
 });
 
-async function criarDisciplina(nome: string) {
-  const resposta = await request(app).post("/api/disciplinas").set(autorizacao).send({ nome });
+async function criarDisciplina(nome: string, criterios: Record<string, unknown> = {}) {
+  const resposta = await request(app).post("/api/disciplinas").set(autorizacao).send({ nome, ...criterios });
   return resposta.body.id as number;
 }
 

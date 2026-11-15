@@ -10,6 +10,7 @@ import { excluirDisciplinaComConfirmacao } from "../utils/excluirDisciplina";
 import { textoPeriodo } from "../utils/aulasDaSemana";
 import { formatarNumero, formatarPercentual, plural } from "../utils/formatacao";
 import { SITUACAO_FREQUENCIA, SITUACAO_NOTA } from "../constants/desempenho";
+import { rotuloPeriodo } from "../constants/periodo";
 import "./DisciplinasPage.css";
 
 function infoComplementar(disciplina) {
@@ -33,7 +34,7 @@ function DisciplinaCard({ disciplina, emEdicao, aoEditar, aoExcluir }) {
           </p>
         </div>
         <div className="disciplina-card-tags">
-          {disciplina.semestre && <span className="tag">{disciplina.semestre}</span>}
+          {rotuloPeriodo(disciplina) && <span className="tag">{rotuloPeriodo(disciplina)}</span>}
           <span className="tag tag-peso">{plural(disciplina.totalEventos, "evento", "eventos")}</span>
           {disciplina.media !== null && (
             <span
@@ -88,7 +89,6 @@ export default function DisciplinasPage() {
 
   const [emEdicao, setEmEdicao] = useState(null);
   const [mensagem, setMensagem] = useState(location.state?.mensagem ?? null);
-  const [filtroSemestre, setFiltroSemestre] = useState("");
 
   useEffect(() => {
     const id = Number(parametros.get("editar"));
@@ -102,11 +102,6 @@ export default function DisciplinasPage() {
   useEffect(() => {
     if (emEdicao) formularioRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [emEdicao]);
-
-  const semestres = [...new Set(disciplinas.map((d) => d.semestre).filter(Boolean))].sort().reverse();
-  const visiveis = filtroSemestre
-    ? disciplinas.filter((disciplina) => disciplina.semestre === filtroSemestre)
-    : disciplinas;
 
   async function salvar(dados) {
     try {
@@ -155,24 +150,6 @@ export default function DisciplinasPage() {
             <h2 id="titulo-minhas-disciplinas" className="titulo-lista">
               Minhas disciplinas
             </h2>
-
-            {semestres.length > 1 && (
-              <div className="campo disciplinas-filtro">
-                <label htmlFor="filtro-semestre">Semestre</label>
-                <select
-                  id="filtro-semestre"
-                  value={filtroSemestre}
-                  onChange={(e) => setFiltroSemestre(e.target.value)}
-                >
-                  <option value="">Todos</option>
-                  {semestres.map((semestre) => (
-                    <option key={semestre} value={semestre}>
-                      {semestre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
           </div>
 
           {carregando && <p className="aviso-vazio">Carregando disciplinas...</p>}
@@ -185,7 +162,7 @@ export default function DisciplinasPage() {
           )}
 
           <div className="disciplinas-lista">
-            {visiveis.map((disciplina) => (
+            {disciplinas.map((disciplina) => (
               <DisciplinaCard
                 key={disciplina.id}
                 disciplina={disciplina}

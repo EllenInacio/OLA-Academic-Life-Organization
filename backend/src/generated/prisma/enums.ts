@@ -33,3 +33,19 @@ export const RegraMedia = {
 } as const
 
 export type RegraMedia = (typeof RegraMedia)[keyof typeof RegraMedia]
+
+
+export const PeriodoTipo = {
+  SEMESTRE: 'SEMESTRE',
+  EXAME: 'EXAME'
+} as const
+
+export type PeriodoTipo = (typeof PeriodoTipo)[keyof typeof PeriodoTipo]
+
+
+export const EtapaAvaliacao = {
+  M1: 'M1',
+  M2: 'M2'
+} as const
+
+export type EtapaAvaliacao = (typeof EtapaAvaliacao)[keyof typeof EtapaAvaliacao]

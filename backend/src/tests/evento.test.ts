@@ -138,6 +138,46 @@ describe("Eventos", () => {
     expect(resposta.body.data.slice(0, 10)).toBe("2026-10-20");
   });
 
+  it("cadastra na M1 quando a etapa não é informada e aceita M2", async () => {
+    const disciplinaId = await criarDisciplina();
+
+    const semEtapa = await request(app).post("/api/eventos").set(autorizacao).send(eventoBase(disciplinaId));
+    const naM2 = await request(app)
+      .post("/api/eventos")
+      .set(autorizacao)
+      .send({ ...eventoBase(disciplinaId), titulo: "Prova 2", etapa: "M2" });
+
+    expect([semEtapa.body.etapa, naM2.body.etapa]).toEqual(["M1", "M2"]);
+  });
+
+  it("muda a etapa na edição e a mantém quando ela não é enviada", async () => {
+    const disciplinaId = await criarDisciplina();
+    const criado = await request(app).post("/api/eventos").set(autorizacao).send(eventoBase(disciplinaId));
+
+    const movido = await request(app)
+      .put(`/api/eventos/${criado.body.id}`)
+      .set(autorizacao)
+      .send({ ...eventoBase(disciplinaId), etapa: "M2" });
+    const semEtapa = await request(app)
+      .put(`/api/eventos/${criado.body.id}`)
+      .set(autorizacao)
+      .send({ ...eventoBase(disciplinaId), titulo: "Prova 1 (remarcada)" });
+
+    expect([movido.body.etapa, semEtapa.body.etapa]).toEqual(["M2", "M2"]);
+  });
+
+  it("recusa etapa diferente de M1 e M2", async () => {
+    const disciplinaId = await criarDisciplina();
+
+    const resposta = await request(app)
+      .post("/api/eventos")
+      .set(autorizacao)
+      .send({ ...eventoBase(disciplinaId), etapa: "M3" });
+
+    expect(resposta.status).toBe(400);
+    expect(resposta.body.erro).toContain("M1 ou M2");
+  });
+
   it("exclui um evento", async () => {
     const disciplinaId = await criarDisciplina();
     const criado = await request(app)

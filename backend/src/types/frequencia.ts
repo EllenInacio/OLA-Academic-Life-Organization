@@ -1,4 +1,5 @@
 export const MAXIMO_AULAS_POR_DIA = 12;
+export const MAXIMO_FALTAS_POR_REGISTRO = 1000;
 
 export type DadosFrequencia = {
   data: string; 

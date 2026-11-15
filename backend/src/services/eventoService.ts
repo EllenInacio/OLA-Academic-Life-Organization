@@ -40,7 +40,6 @@ export async function criar(usuarioId: number, dados: DadosEvento) {
 
   if (dados.nota !== undefined && dados.nota !== null) {
     garantirAvaliativo(dados.peso);
-    // Avaliação cadastrada já com nota: está concluída.
     return eventoModel.criar({ ...dados, status: "CONCLUIDO" });
   }
 

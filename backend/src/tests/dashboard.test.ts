@@ -56,8 +56,8 @@ describe("Dashboard", () => {
   });
 
   it("calcula os indicadores a partir dos eventos do calendário", async () => {
-    const banco = await criarDisciplina("Banco de Dados", { semestre: "2026.2" });
-    const calculo = await criarDisciplina("Cálculo I", { semestre: "2026.2" });
+    const banco = await criarDisciplina("Banco de Dados");
+    const calculo = await criarDisciplina("Cálculo I");
 
     await criarEvento(banco, "Prova de SQL", 2);
     await criarEvento(banco, "Lista 1", -10, "CONCLUIDO");
@@ -67,13 +67,12 @@ describe("Dashboard", () => {
     const resposta = await request(app).get("/api/dashboard").set(autorizacao);
     const painel = resposta.body;
 
-    expect(painel.semestres).toEqual(["2026.2"]);
     expect(painel.resumo).toEqual({
       disciplinas: 2,
       eventos: { total: 4, pendentes: 2, emAndamento: 1, concluidos: 1, abertos: 3, atrasados: 1 },
       prazosProximos: 1,
       mediaGeral: { valor: null, disciplinasComNota: 0 },
-      avaliacoesAguardandoNota: 2, // "Lista 1" e "Lista atrasada": data passada, sem nota
+      avaliacoesAguardandoNota: 2,
       disciplinasEmAtencao: 0,
     });
     expect(painel.proximosEventos.map((e: { titulo: string; diasRestantes: number }) => [e.titulo, e.diasRestantes])).toEqual([
@@ -85,7 +84,6 @@ describe("Dashboard", () => {
     expect(painel.alertas.map((a: AlertaResposta) => [a.tipo, a.nivel, a.evento?.titulo ?? a.disciplina.nome])).toEqual([
       ["PRAZO_PROXIMO", "alto", "Prova de SQL"],
       ["PRAZO_VENCIDO", "medio", "Lista atrasada"],
-      // "Lista 1" está concluída, com data passada e sem nota lançada
       ["NOTA_AGUARDANDO", "medio", "Banco de Dados"],
     ]);
     expect(painel.disciplinas.map((d: { nome: string; eventos: { total: number } }) => [d.nome, d.eventos.total])).toEqual([

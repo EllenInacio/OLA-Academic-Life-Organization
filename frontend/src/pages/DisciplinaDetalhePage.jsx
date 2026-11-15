@@ -8,8 +8,9 @@ import * as disciplinaService from "../services/disciplinaService";
 import { mensagemDeErro } from "../services/api";
 import { excluirDisciplinaComConfirmacao } from "../utils/excluirDisciplina";
 import Selo from "../components/Selo";
-import { BarraFrequencia } from "../components/FrequenciaCard";
-import { SITUACAO_FREQUENCIA, SITUACAO_NOTA, rotuloRegra } from "../constants/desempenho";
+import { BarraFrequencia, textoFaltasEmAulas, textoLimite } from "../components/FrequenciaCard";
+import { SITUACAO_FREQUENCIA, SITUACAO_NOTA, estadoDaMedia, rotuloRegra } from "../constants/desempenho";
+import { rotuloPeriodo } from "../constants/periodo";
 import { textoPeriodo } from "../utils/aulasDaSemana";
 import { formatarData, formatarNumero, formatarPercentual, plural, textoPrazo } from "../utils/formatacao";
 import "./DashboardPage.css";
@@ -18,7 +19,7 @@ import "./DisciplinasPage.css";
 function subtitulo(disciplina) {
   const partes = [
     disciplina.professor,
-    disciplina.semestre && `Semestre ${disciplina.semestre}`,
+    rotuloPeriodo(disciplina),
     disciplina.horario,
     textoPeriodo(disciplina),
     disciplina.cargaHoraria && `${disciplina.cargaHoraria}h`,
@@ -172,13 +173,21 @@ export default function DisciplinaDetalhePage() {
               <p className="painel-nota">
                 {desempenho.avaliacoes.total === 0
                   ? "Nenhuma avaliação (evento com peso) cadastrada."
-                  : `${desempenho.avaliacoes.comNota} de ${plural(desempenho.avaliacoes.total, "avaliação com nota", "avaliações com nota")}${desempenho.final ? " (média final)" : " (média parcial)"}`}
+                  : `${desempenho.avaliacoes.comNota} de ${plural(desempenho.avaliacoes.total, "avaliação com nota", "avaliações com nota")} · ${estadoDaMedia(desempenho).curto}`}
               </p>
             </div>
           </div>
+          <p className="painel-nota">
+            {desempenho.etapas
+              .map(
+                (etapa) =>
+                  `${etapa.etapa}: ${etapa.media === null ? "sem notas" : formatarNumero(etapa.media)} (peso ${formatarNumero(etapa.peso)})`
+              )
+              .join(" · ")}
+          </p>
           {desempenho.notaNecessaria && desempenho.notaNecessaria.alcancavel && desempenho.notaNecessaria.valor > 0 && (
             <p className="painel-nota">
-              Para chegar à média: {formatarNumero(desempenho.notaNecessaria.valor)} nas avaliações restantes.
+              Para chegar à média: {formatarNumero(desempenho.notaNecessaria.valor)} no que ainda falta lançar.
             </p>
           )}
           {desempenho.notaNecessaria && !desempenho.notaNecessaria.alcancavel && (
@@ -192,24 +201,30 @@ export default function DisciplinaDetalhePage() {
           <h2 id="titulo-freq-disciplina" className="painel-titulo">
             Frequência
           </h2>
-          <p className="painel-nota">Limite de reprovação: {formatarPercentual(frequencia.limiteFaltas)} de faltas</p>
+          <p className="painel-nota">{textoLimite(frequencia)}</p>
           <div className="detalhe-destaque">
             <strong>
-              {frequencia.percentualFaltas === null ? "—" : formatarPercentual(frequencia.percentualFaltas)}
+              {frequencia.percentualPresenca === null ? "—" : formatarPercentual(frequencia.percentualPresenca)}
             </strong>
             <div>
               <Selo situacao={frequencia.situacao} mapa={SITUACAO_FREQUENCIA} />
               <p className="painel-nota">
                 {frequencia.aulasRegistradas === 0
                   ? "Nenhuma aula registrada."
-                  : `${plural(frequencia.faltas, "falta", "faltas")} em ${plural(frequencia.aulasRegistradas, "aula registrada", "aulas registradas")}`}
+                  : `Frequência · ${textoFaltasEmAulas(frequencia)} (${formatarPercentual(frequencia.percentualFaltas)} de faltas)`}
               </p>
             </div>
           </div>
           {frequencia.aulasRegistradas > 0 && <BarraFrequencia frequencia={frequencia} />}
+          {frequencia.faltasAcimaDoTotal && (
+            <p className="painel-nota texto-critico-inline">
+              As faltas registradas passam do total de aulas. Confira os dias, horários e datas das aulas ou os
+              registros.
+            </p>
+          )}
           <p className="painel-nota">
             {frequencia.faltasPermitidas === null
-              ? "Cadastre a carga horária para saber quantas faltas ainda são permitidas."
+              ? "Cadastre o limite de faltas para saber quantas faltas ainda são permitidas."
               : frequencia.faltasRestantes >= 0
                 ? `Ainda pode faltar ${plural(frequencia.faltasRestantes, "aula", "aulas")} (limite: ${frequencia.faltasPermitidas}).`
                 : `Limite de ${frequencia.faltasPermitidas} faltas ultrapassado.`}

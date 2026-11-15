@@ -27,6 +27,16 @@ enum RegraMedia {
   ARITMETICA
 }
 
+enum PeriodoTipo {
+  SEMESTRE
+  EXAME
+}
+
+enum EtapaAvaliacao {
+  M1
+  M2
+}
+
 model Usuario {
   id                        Int       @id @default(autoincrement())
   nome                      String    @db.VarChar(120)
@@ -53,16 +63,17 @@ model Disciplina {
   id             Int        @id @default(autoincrement())
   nome           String     @db.VarChar(120)
   professor      String?    @db.VarChar(120)
-  semestre       String?    @db.VarChar(10)
+  periodoTipo    PeriodoTipo? @map("periodo_tipo")
+  periodoNumero  Int?       @map("periodo_numero")
   cargaHoraria   Int?       @map("carga_horaria")
   horario        String?    @db.VarChar(120)
-  // Período em que a disciplina tem aula (opcional): o calendário geral só mostra as aulas dentro dele.
   inicioAulas    DateTime?  @map("inicio_aulas") @db.Date
   fimAulas       DateTime?  @map("fim_aulas") @db.Date
-  // Critérios de avaliação (Etapa 2)
   regraMedia     RegraMedia @default(PONDERADA) @map("regra_media")
   mediaAprovacao Decimal?   @map("media_aprovacao") @db.Decimal(4, 2)
-  limiteFaltas   Decimal    @default(25) @map("limite_faltas") @db.Decimal(5, 2)
+  pesoM1         Decimal    @default(1) @map("peso_m1") @db.Decimal(5, 2)
+  pesoM2         Decimal    @default(2) @map("peso_m2") @db.Decimal(5, 2)
+  limiteFaltas   Int?       @map("limite_faltas")
   usuarioId      Int        @map("usuario_id")
   criadoEm       DateTime   @default(now()) @map("criado_em")
 
@@ -78,6 +89,7 @@ model Evento {
   id           Int          @id @default(autoincrement())
   titulo       String       @db.VarChar(150)
   tipo         TipoEvento
+  etapa        EtapaAvaliacao @default(M1)
   data         DateTime     @db.Date
   peso         Decimal      @db.Decimal(5, 2)
   status       StatusEvento @default(PENDENTE)
@@ -93,7 +105,6 @@ model Evento {
   @@map("evento")
 }
 
-// Uma linha por dia de aula: quantas aulas houve e em quantas o aluno faltou.
 model RegistroFrequencia {
   id              Int      @id @default(autoincrement())
   data            DateTime @db.Date

@@ -1,12 +1,16 @@
 export const TIPOS_EVENTO = ["PROVA", "TRABALHO", "ENTREGA"];
 export const STATUS_EVENTO = ["PENDENTE", "EM_ANDAMENTO", "CONCLUIDO"];
 
+export const ETAPAS_AVALIACAO = ["M1", "M2"];
+
 export type TipoEvento = "PROVA" | "TRABALHO" | "ENTREGA";
+export type EtapaAvaliacao = "M1" | "M2";
 export type StatusEvento = "PENDENTE" | "EM_ANDAMENTO" | "CONCLUIDO";
 
 export type DadosEvento = {
   titulo: string;
   tipo: TipoEvento;
+  etapa?: EtapaAvaliacao;
   data: string;
   peso: number;
   status?: StatusEvento;

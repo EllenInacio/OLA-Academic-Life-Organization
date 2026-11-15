@@ -23,6 +23,7 @@ function evento(dados: Partial<EventoParaCalculo> & Pick<EventoParaCalculo, "dat
     status: "PENDENTE",
     nota: null,
     notaMaxima: 10,
+    etapa: "M1",
     disciplina: CALCULO,
     ...dados,
   };
@@ -31,13 +32,14 @@ function evento(dados: Partial<EventoParaCalculo> & Pick<EventoParaCalculo, "dat
 const CRITERIOS_PADRAO = {
   regraMedia: "PONDERADA" as const,
   mediaAprovacao: null,
-  limiteFaltas: 25,
+  pesoM1: 1,
+  pesoM2: 1,
+  limiteFaltas: null,
   frequencias: [],
 };
 
 describe("Cálculos de prazo", () => {
   it("usa o fuso de Brasília para definir o dia de hoje", () => {
-    // 01:30 UTC do dia 14 ainda é dia 13 em São Paulo (UTC-3).
     const agora = new Date("2026-10-14T01:30:00Z");
 
     expect(dataDeHoje(agora, "America/Sao_Paulo")).toBe("2026-10-13");
@@ -54,7 +56,7 @@ describe("Cálculos de prazo", () => {
     expect(diasEntre("2026-10-13", "2026-10-16")).toBe(3);
     expect(diasEntre("2026-10-13", "2026-10-10")).toBe(-3);
     expect(diasEntre("2026-12-30", "2027-01-02")).toBe(3);
-    expect(diasEntre("2028-02-28", "2028-03-01")).toBe(2); // ano bissexto
+    expect(diasEntre("2028-02-28", "2028-03-01")).toBe(2);
   });
 
   it("recusa data fora do formato", () => {
@@ -65,10 +67,10 @@ describe("Cálculos de prazo", () => {
 describe("Indicadores do Dashboard", () => {
   it("conta eventos por status e identifica os atrasados", () => {
     const eventos = [
-      evento({ data: "2026-10-10", status: "PENDENTE" }), // atrasado
-      evento({ data: "2026-10-12", status: "EM_ANDAMENTO" }), // atrasado
-      evento({ data: "2026-10-01", status: "CONCLUIDO" }), // concluído não atrasa
-      evento({ data: "2026-10-13", status: "PENDENTE" }), // hoje não está atrasado
+      evento({ data: "2026-10-10", status: "PENDENTE" }),
+      evento({ data: "2026-10-12", status: "EM_ANDAMENTO" }),
+      evento({ data: "2026-10-01", status: "CONCLUIDO" }),
+      evento({ data: "2026-10-13", status: "PENDENTE" }),
       evento({ data: "2026-10-20", status: "EM_ANDAMENTO" }),
     ];
 
@@ -142,7 +144,6 @@ describe("Indicadores do Dashboard", () => {
     expect(painel.proximosEventos).toEqual([]);
     expect(painel.alertas).toEqual([]);
     expect(painel.disciplinas).toEqual([]);
-    expect(painel.semestres).toEqual([]);
   });
 
   it("consolida os eventos de todas as disciplinas e resume cada uma", () => {
@@ -151,7 +152,6 @@ describe("Indicadores do Dashboard", () => {
         ...BANCO,
         ...CRITERIOS_PADRAO,
         professor: null,
-        semestre: "2026.2",
         cargaHoraria: 64,
         horario: null,
         eventos: [
@@ -163,7 +163,6 @@ describe("Indicadores do Dashboard", () => {
         ...CALCULO,
         ...CRITERIOS_PADRAO,
         professor: "Helena",
-        semestre: "2026.1",
         cargaHoraria: null,
         horario: "Seg e Qua",
         eventos: [evento({ titulo: "Prova 2", data: "2026-10-14" })],
@@ -175,7 +174,6 @@ describe("Indicadores do Dashboard", () => {
     expect(painel.resumo.disciplinas).toBe(2);
     expect(painel.resumo.eventos.total).toBe(3);
     expect(painel.resumo.prazosProximos).toBe(2);
-    expect(painel.semestres).toEqual(["2026.2", "2026.1"]);
     expect(painel.proximosEventos.map((e) => e.titulo)).toEqual(["Prova 2", "Prova de SQL"]);
     expect(painel.disciplinas[0]).toMatchObject({
       nome: "Banco de Dados",

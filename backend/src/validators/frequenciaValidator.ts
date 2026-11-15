@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
 import { idRules } from "./eventoValidator";
-import { MAXIMO_AULAS_POR_DIA } from "../types/frequencia";
+import { MAXIMO_AULAS_POR_DIA, MAXIMO_FALTAS_POR_REGISTRO } from "../types/frequencia";
 
 const camposRules = [
   body("data")
@@ -17,12 +17,11 @@ const camposRules = [
     .toInt(),
 
   body("faltas")
-    .isInt({ min: 0, max: MAXIMO_AULAS_POR_DIA })
-    .withMessage("Informe o número de faltas (0 se esteve presente).")
-    .bail()
-    .toInt()
-    .custom((faltas, { req }) => faltas <= (req.body.quantidadeAulas ?? 1))
-    .withMessage("O número de faltas não pode ser maior que a quantidade de aulas do dia."),
+    .isInt({ min: 0, max: MAXIMO_FALTAS_POR_REGISTRO, allow_leading_zeroes: false })
+    .withMessage(
+      `Informe o número de faltas: um número inteiro de 0 a ${MAXIMO_FALTAS_POR_REGISTRO} (0 se esteve presente).`
+    )
+    .toInt(),
 ];
 
 export const criarFrequenciaRules = [

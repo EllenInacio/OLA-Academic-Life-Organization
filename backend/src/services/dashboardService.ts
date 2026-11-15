@@ -6,7 +6,7 @@ import {
   montarPainel,
   proximosEventos,
 } from "../calculos/painel";
-import { RegraMedia } from "../calculos/notas";
+import { Etapa, RegraMedia } from "../calculos/notas";
 import { dataDeHoje, paraDataISO } from "../calculos/prazos";
 import { StatusEvento, TipoEvento } from "../types/evento";
 
@@ -16,14 +16,15 @@ type DisciplinaComEventosDoBanco = {
   id: number;
   nome: string;
   professor: string | null;
-  semestre: string | null;
   cargaHoraria: number | null;
   horario: string | null;
   inicioAulas?: Date | null;
   fimAulas?: Date | null;
   regraMedia: RegraMedia;
   mediaAprovacao: Decimal | null;
-  limiteFaltas: Decimal;
+  pesoM1: Decimal;
+  pesoM2: Decimal;
+  limiteFaltas: number | null;
   eventos: {
     id: number;
     titulo: string;
@@ -33,6 +34,7 @@ type DisciplinaComEventosDoBanco = {
     status: StatusEvento;
     nota: Decimal | null;
     notaMaxima: Decimal;
+    etapa: Etapa;
   }[];
   frequencias: { quantidadeAulas: number; faltas: number }[];
 };
@@ -42,14 +44,15 @@ export function prepararParaCalculo(disciplina: DisciplinaComEventosDoBanco): Di
     id: disciplina.id,
     nome: disciplina.nome,
     professor: disciplina.professor,
-    semestre: disciplina.semestre,
     cargaHoraria: disciplina.cargaHoraria,
     horario: disciplina.horario,
     inicioAulas: disciplina.inicioAulas ? paraDataISO(disciplina.inicioAulas) : null,
     fimAulas: disciplina.fimAulas ? paraDataISO(disciplina.fimAulas) : null,
     regraMedia: disciplina.regraMedia,
     mediaAprovacao: disciplina.mediaAprovacao === null ? null : Number(disciplina.mediaAprovacao),
-    limiteFaltas: Number(disciplina.limiteFaltas),
+    pesoM1: Number(disciplina.pesoM1),
+    pesoM2: Number(disciplina.pesoM2),
+    limiteFaltas: disciplina.limiteFaltas,
     eventos: disciplina.eventos.map((evento) => ({
       id: evento.id,
       titulo: evento.titulo,
@@ -59,6 +62,7 @@ export function prepararParaCalculo(disciplina: DisciplinaComEventosDoBanco): Di
       status: evento.status,
       nota: evento.nota === null ? null : Number(evento.nota),
       notaMaxima: Number(evento.notaMaxima),
+      etapa: evento.etapa,
       disciplina: { id: disciplina.id, nome: disciplina.nome },
     })),
     frequencias: disciplina.frequencias.map((registro) => ({

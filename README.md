@@ -11,9 +11,15 @@ Funcionalidades implementadas:
   trabalhos, média e frequência por disciplina, disciplinas em atenção, pontos de
   atenção (prazos, média, frequência e notas pendentes) e andamento por disciplina.
 - **Gestão de disciplinas**: cadastro, consulta, detalhes, edição e exclusão protegida
-  (nome, professor, semestre, carga horária, horário e critérios de avaliação).
-- **Notas e frequência**: lançamento de notas por avaliação com cálculo automático da
-  média (ponderada ou aritmética, configurável por disciplina), nota necessária para
+  (nome, professor, período acadêmico — semestre do curso ou Exame/Recuperação —, carga
+  horária, horário e critérios de avaliação). A carga horária não é digitada: o sistema
+  calcula pelos dias, horários e datas de início e fim das aulas e salva junto com a
+  disciplina. O formulário mostra o valor calculado enquanto o aluno preenche, e ele é o
+  total de aulas usado no cálculo da frequência.
+- **Notas e frequência**: lançamento de notas por avaliação, separadas por etapa (Média Final 1 e
+  Média Final 2), com cálculo automático da média de cada etapa (ponderada ou aritmética,
+  configurável por disciplina) e da média final (M1 e M2 com o peso definido na
+  disciplina), nota necessária para
   atingir a média, registro de presença e falta por dia de aula, percentual de faltas e
   quantas faltas ainda são permitidas.
 - **Calendário de provas e trabalhos**: cadastro, edição, exclusão e visualização
@@ -54,7 +60,7 @@ OLA/
 │   │   ├── schema.prisma        modelo de dados
 │   │   └── seed.ts              usuário e dados de teste
 │   ├── src/
-│   │   ├── calculos/            regras de cálculo puras (prazos, média, frequência e dashboard)
+│   │   ├── calculos/            regras de cálculo puras (prazos, carga horária, média, frequência e dashboard)
 │   │   ├── config/              conexão com o banco e variáveis de segurança
 │   │   ├── controllers/         recebem a requisição e devolvem a resposta
 │   │   ├── errors/              erro de negócio com código HTTP
@@ -123,12 +129,15 @@ o usuário que realizou a ação.
 | id | SERIAL | chave primária |
 | nome | VARCHAR(120) | obrigatório, único por usuário |
 | professor | VARCHAR(120) | opcional |
-| semestre | VARCHAR(10) | opcional, formato AAAA.N (ex.: 2026.2) |
-| carga_horaria | INTEGER | opcional, em horas (1 a 1000) |
+| carga_horaria | INTEGER | em horas (1 a 1000), calculada pelo sistema a partir do horário e do período das aulas; nula quando eles não foram informados |
 | horario | VARCHAR(120) | opcional, texto livre (ex.: Seg e Qua · 08:00–09:40) |
 | regra_media | ENUM | PONDERADA (padrão) ou ARITMETICA |
 | media_aprovacao | DECIMAL(4,2) | opcional, escala 0–10; sem ela, a situação não é exibida |
-| limite_faltas | DECIMAL(5,2) | percentual, padrão 25 |
+| peso_m1 | DECIMAL(5,2) | peso da M1 na média final (maior que 0, até 100; padrão 1) |
+| peso_m2 | DECIMAL(5,2) | peso da M2 na média final (maior que 0, até 100; padrão 2) |
+| periodo_tipo | ENUM | opcional: SEMESTRE ou EXAME (Exame/Recuperação, modalidade à parte) |
+| periodo_numero | INTEGER | número do semestre (1 a 12), só quando o tipo é SEMESTRE |
+| limite_faltas | INTEGER | opcional, quantidade de faltas permitidas no semestre (0 a 1000); sem ele, a situação da frequência não é avaliada |
 | usuario_id | INTEGER | chave estrangeira → usuario.id |
 | criado_em | TIMESTAMP | preenchido automaticamente |
 
@@ -139,6 +148,7 @@ o usuário que realizou a ação.
 | id | SERIAL | chave primária |
 | titulo | VARCHAR(150) | obrigatório |
 | tipo | ENUM | PROVA, TRABALHO ou ENTREGA |
+| etapa | ENUM | M1 (padrão) ou M2: etapa em que a avaliação entra na média |
 | data | DATE | obrigatório |
 | peso | DECIMAL(5,2) | obrigatório |
 | status | ENUM | PENDENTE, EM_ANDAMENTO ou CONCLUIDO |
@@ -320,6 +330,7 @@ Exemplo de corpo para criar um evento:
 {
   "titulo": "Prova 1",
   "tipo": "PROVA",
+  "etapa": "M1",
   "data": "2026-10-15",
   "peso": 3,
   "status": "PENDENTE",
@@ -333,17 +344,22 @@ Exemplo de corpo para criar ou editar uma disciplina (só `nome` é obrigatório
 {
   "nome": "Cálculo I",
   "professor": "Helena Duarte",
-  "semestre": "2026.2",
-  "cargaHoraria": 72,
-  "horario": "Seg e Qua · 08:00–09:40",
+  "periodoTipo": "SEMESTRE",
+  "periodoNumero": 2,
+  "horario": "Seg 19:00–22:00, Qua 19:00–22:00",
+  "inicioAulas": "2026-08-03",
+  "fimAulas": "2026-12-18",
   "regraMedia": "PONDERADA",
   "mediaAprovacao": 6,
-  "limiteFaltas": 25
+  "pesoM1": 1,
+  "pesoM2": 2,
+  "limiteFaltas": 18
 }
 ```
 
 O `POST /eventos` também aceita `nota` e `notaMaxima` opcionais, para cadastrar uma
-avaliação que já tem nota (ela é salva como concluída).
+avaliação que já tem nota (ela é salva como concluída). A `etapa` é opcional: sem ela, o
+evento é criado na M1; no `PUT /eventos/:id`, sem ela a etapa atual é mantida.
 
 Erros são devolvidos no formato `{ "erro": "mensagem" }`.
 
@@ -368,39 +384,79 @@ banco, o que permite testá-las isoladamente (`calculos.test.ts`).
 | Disciplinas em atenção | Disciplinas com alerta de média ou de frequência |
 | Nota pendente | Avaliação concluída, com data passada, ainda sem nota |
 
+### Carga horária da disciplina (`calculos/cargaHoraria.ts`)
+
+- A carga horária é calculada pelo sistema ao criar ou editar a disciplina; um valor
+  enviado pelo usuário é ignorado.
+- Para cada dia da semana marcado no horário (formato `Seg 19:00–22:00, Qua 19:00–22:00`),
+  o sistema conta quantas vezes esse dia cai entre o início e o fim das aulas, contando
+  as duas datas, e multiplica pela duração do encontro (`término − início`).
+- **Carga horária** = soma de todos os encontros, em horas de 60 minutos, arredondada
+  para o inteiro mais próximo.
+- Sem horário, sem data de início ou sem data de fim, a disciplina fica sem carga
+  horária. Mudar os dias, os horários ou as datas recalcula o valor.
+- Feriados e aulas canceladas não são descontados: nenhum calendário de feriados é
+  presumido.
+- Se o resultado passar de 1000 horas, a disciplina é recusada com uma mensagem para
+  conferir os horários e as datas.
+
+Exemplo: segunda e quarta das 19:00 às 22:00, de 03/08/2026 a 18/12/2026 → 20 segundas e
+20 quartas = 40 encontros de 3 horas = **120 horas**.
+
 ### Média da disciplina (`calculos/notas.ts`)
 
 - Avaliação = evento com peso maior que zero. Eventos com peso 0 não entram na média.
 - Cada nota é convertida para a escala 0–10: `nota ÷ nota máxima × 10`.
-- **Ponderada**: `Σ(nota × peso) ÷ Σ(peso)`. **Aritmética**: `Σ(nota) ÷ quantidade`.
-- Só entram as avaliações com nota lançada; enquanto faltar alguma, a média é **parcial**.
+- Cada avaliação pertence a uma **etapa**: M1 ou M2 (campo `etapa` do evento). A etapa é
+  escolhida na tela de Notas e frequência ou no formulário do calendário.
+- **Média de cada etapa**, só com as avaliações daquela etapa que têm nota lançada —
+  **ponderada**: `Σ(nota × peso) ÷ Σ(peso)`; **aritmética**: `Σ(nota) ÷ quantidade`.
+- **Média final** = `(M1 × peso da M1 + M2 × peso da M2) ÷ (peso da M1 + peso da M2)`,
+  com os pesos cadastrados na disciplina (padrão: M1 = 1 e M2 = 2). O cálculo usa as
+  médias das etapas já arredondadas em duas casas, como aparecem na tela.
+- A média é **parcial** enquanto alguma etapa não tem avaliação ou tem avaliação sem
+  nota; se só uma etapa tem nota, a média parcial é a média dessa etapa. Ela só é
+  **final** quando as duas etapas têm avaliações e todas estão com nota.
 - **Situação**: só é exibida quando a disciplina tem média de aprovação. Parcial acima/
-  abaixo da média enquanto houver avaliação sem nota; "atingiu a média" ou "abaixo da
-  média" quando todas têm nota.
-- **Nota necessária**: média que falta tirar nas avaliações sem nota para chegar à média
-  de aprovação: `(média de aprovação × peso total − Σ(nota × peso)) ÷ peso restante`
-  (na aritmética, cada avaliação tem peso 1). Se passar de 10, a média não é mais
-  alcançável com as avaliações cadastradas.
+  abaixo da média enquanto a média for parcial; "atingiu a média" ou "abaixo da média"
+  quando ela é final.
+- **Nota necessária**: média `x` que falta tirar em tudo o que está em aberto (avaliações
+  sem nota e etapa ainda sem avaliações) para a média final chegar à média de aprovação.
+  Em cada etapa com avaliações, a média com `x` é `(Σ(nota × peso) + x × peso restante)
+  ÷ peso total`; uma etapa sem avaliações vale `x`. Resolve-se a equação da média final
+  para `x`. Se passar de 10, a média não é mais alcançável.
 
-Exemplo (protótipo): Prova 1 = 6,5 (peso 3), Lista = 8,0 (peso 1), Prova 2 sem nota
-(peso 3) → média parcial `(6,5×3 + 8×1) ÷ 4 = 6,88`; com média de aprovação 6, a nota
-necessária na Prova 2 é `(6×7 − 27,5) ÷ 3 = 4,83`.
+Exemplo: disciplina com M1 peso 4 e M2 peso 6, média de aprovação 6. Na M1, Prova 1 =
+6,5 (peso 3) e Lista = 8,0 (peso 1) → `(6,5×3 + 8×1) ÷ 4 = 6,88`. Na M2, Trabalho = 9,0
+(peso 1) e Prova 2 sem nota (peso 3) → média parcial da M2 = 9,00. Média parcial da
+disciplina: `(6,88×4 + 9,00×6) ÷ 10 = 8,15`. Nota necessária na Prova 2:
+`(6,875×4 + (9 + 3x) ÷ 4 × 6) ÷ 10 = 6` → `x = 4,22`.
 
 ### Frequência da disciplina (`calculos/frequencia.ts`)
 
-- Os dados vêm dos registros feitos pelo próprio aluno: um registro por dia de aula, com
-  a quantidade de aulas e de faltas. O sistema não cria registros por conta própria.
-- **Percentual de faltas (parcial)** = `faltas ÷ aulas registradas × 100`. Sem registros,
-  nenhum percentual é exibido.
-- **Aulas previstas** = carga horária × 1 (cada hora de carga horária conta como uma aula;
-  constante `AULAS_POR_HORA`).
-- **Faltas permitidas** = arredondamento para baixo de `aulas previstas × limite %`
-  (ex.: 72h com limite de 25% → 18 faltas).
-- **Situação**: com carga horária, compara as faltas com as permitidas — "perto do limite"
-  a partir de 75% delas, "limite ultrapassado" acima. Sem carga horária, usa o percentual
-  parcial e é indicada como parcial.
-- Avisos extras: ritmo atual de faltas acima do limite (estimativa) e mais aulas
-  registradas do que a carga horária prevê.
+- Os dados vêm do **total de aulas da disciplina** (a carga horária calculada pelo sistema)
+  e dos registros de faltas feitos pelo aluno, um por dia de aula. O sistema não cria
+  registros por conta própria.
+- Aulas e faltas usam a **mesma unidade**: cada hora da carga horária conta como uma aula. As faltas de um registro não são limitadas pela quantidade de
+  aulas do dia: dá para lançar várias faltas no mesmo dia (inteiro de 0 a 1000).
+- **Percentual de faltas** = `faltas ÷ total de aulas da disciplina × 100` e **frequência**
+  = `100 − percentual de faltas`. Mudar o total de aulas ou as faltas recalcula o
+  percentual; os registros de faltas não são apagados.
+- Sem o total de aulas cadastrado, o percentual é **parcial** e usa as aulas registradas
+  (`faltas ÷ aulas registradas × 100`). Sem registros, nenhum percentual é exibido.
+- **Inconsistência**: se as faltas passam do total de aulas, o registro é aceito, o
+  sistema avisa (`faltasAcimaDoTotal`) e o percentual para em 100% de faltas e 0% de
+  frequência (nunca negativo).
+- **Faltas permitidas** = o limite de faltas cadastrado na disciplina, informado pelo aluno
+  como **quantidade** de faltas (ex.: 18), e não como percentual.
+- **Faltas restantes** = `faltas permitidas − faltas registradas`.
+- **Situação**: compara as faltas com as permitidas — "perto do limite" a partir de 75%
+  delas, "limite ultrapassado" acima. Sem limite cadastrado, o sistema conta as faltas e
+  mostra o percentual, mas indica "limite de faltas não definido".
+- **Total de aulas** = carga horária × 1 (constante `AULAS_POR_HORA`).
+- Avisos extras (dependem da carga horária): ritmo atual de faltas acima do limite
+  (estimativa: `faltas ÷ aulas registradas × total de aulas > faltas permitidas`) e mais
+  aulas registradas do que a carga horária prevê.
 
 ## Segurança e LGPD
 

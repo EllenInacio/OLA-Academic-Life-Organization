@@ -1,5 +1,11 @@
 import { body, param } from "express-validator";
-import { TIPOS_EVENTO, STATUS_EVENTO, LIMITE_NOTA, NOTA_MAXIMA_PADRAO } from "../types/evento";
+import {
+  ETAPAS_AVALIACAO,
+  TIPOS_EVENTO,
+  STATUS_EVENTO,
+  LIMITE_NOTA,
+  NOTA_MAXIMA_PADRAO,
+} from "../types/evento";
 
 export const idRules = [
   param("id").isInt({ min: 1 }).withMessage("Id inválido."),
@@ -16,6 +22,11 @@ export const criarEventoRules = [
   body("tipo")
     .isIn(TIPOS_EVENTO)
     .withMessage("Tipo inválido. Use PROVA, TRABALHO ou ENTREGA."),
+
+  body("etapa")
+    .optional()
+    .isIn(ETAPAS_AVALIACAO)
+    .withMessage("Etapa inválida. Use M1 ou M2."),
 
   body("data")
     .isISO8601()

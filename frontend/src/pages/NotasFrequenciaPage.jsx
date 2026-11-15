@@ -57,7 +57,21 @@ export default function NotasFrequenciaPage() {
     aoCriar: (dados) =>
       executar(
         () => eventoService.criar({ ...dados, disciplinaId: disciplina.id }),
-        `Avaliação "${dados.titulo}" adicionada${dados.nota !== undefined ? " com nota" : ""}.`
+        `Avaliação "${dados.titulo}" adicionada na ${dados.etapa}${dados.nota !== undefined ? " com nota" : ""}.`
+      ),
+    aoMudarEtapa: (avaliacao, etapa) =>
+      executar(
+        () =>
+          eventoService.atualizar(avaliacao.id, {
+            titulo: avaliacao.titulo,
+            tipo: avaliacao.tipo,
+            data: avaliacao.data.slice(0, 10),
+            peso: Number(avaliacao.peso),
+            status: avaliacao.status,
+            disciplinaId: disciplina.id,
+            etapa,
+          }),
+        `"${avaliacao.titulo}" agora conta na ${etapa}.`
       ),
   };
 
@@ -80,7 +94,7 @@ export default function NotasFrequenciaPage() {
   return (
     <Pagina
       titulo="Notas e frequência"
-      subtitulo="Lance suas notas e registre presenças — a média e o percentual de faltas são calculados automaticamente"
+      subtitulo="Lance suas notas por etapa (M1 e M2) e registre presenças — as médias e o percentual de faltas são calculados automaticamente"
     >
       <Mensagem texto={mensagem?.texto} tipo={mensagem?.tipo} aoFechar={() => setMensagem(null)} />
       <Mensagem texto={erroDisciplinas || erro} tipo="erro" />

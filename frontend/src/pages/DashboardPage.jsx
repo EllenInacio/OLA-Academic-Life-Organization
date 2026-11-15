@@ -2,13 +2,13 @@ import { Link } from "react-router-dom";
 import CalendarioMensal from "../components/CalendarioMensal";
 import EstadoVazio from "../components/EstadoVazio";
 import EventoResumo from "../components/EventoResumo";
-import { BarraFrequencia } from "../components/FrequenciaCard";
+import { BarraFrequencia, textoFaltasEmAulas } from "../components/FrequenciaCard";
 import GraficoAtividades from "../components/GraficoAtividades";
 import Mensagem from "../components/Mensagem";
 import Pagina from "../components/Pagina";
 import Selo from "../components/Selo";
 import { TIPOS_EVENTO, rotuloDe } from "../constants/evento";
-import { SITUACAO_FREQUENCIA, SITUACAO_NOTA } from "../constants/desempenho";
+import { SITUACAO_FREQUENCIA, SITUACAO_NOTA, estadoDaMedia } from "../constants/desempenho";
 import { useAuth } from "../contexts/AuthContext";
 import { useDashboard } from "../hooks/useDashboard";
 import { useEventos } from "../hooks/useEventos";
@@ -38,10 +38,7 @@ const SELO_DO_ALERTA = {
 function subtituloDoPainel(painel) {
   if (!painel) return "Seu resumo acadêmico de hoje";
 
-  const data = formatarDataExtensa(painel.hoje);
-  return painel.semestres.length === 1
-    ? `Semestre ${painel.semestres[0]} · seu resumo acadêmico de ${data}`
-    : `Seu resumo acadêmico de ${data}`;
+  return `Seu resumo acadêmico de ${formatarDataExtensa(painel.hoje)}`;
 }
 
 function Indicador({ rotulo, valor, detalhe, destaque = false }) {
@@ -73,10 +70,7 @@ function TextoAlerta({ alerta }) {
     case "FREQUENCIA_ACIMA_DO_LIMITE":
     case "FREQUENCIA_PERTO_DO_LIMITE": {
       const acima = alerta.tipo === "FREQUENCIA_ACIMA_DO_LIMITE";
-      const detalhe =
-        valores.faltasPermitidas !== null
-          ? `${plural(valores.faltas, "falta", "faltas")} de ${valores.faltasPermitidas} permitidas`
-          : `${formatarPercentual(valores.percentualFaltas)} de faltas nas aulas registradas (limite: ${formatarPercentual(valores.limiteFaltas)})`;
+      const detalhe = `${plural(valores.faltas, "falta", "faltas")} de ${valores.faltasPermitidas} permitidas`;
       return (
         <>
           <strong>{disciplina.nome}</strong> —{" "}
@@ -152,7 +146,10 @@ function MediasPorDisciplina({ disciplinas }) {
       <h2 id="titulo-medias" className="painel-titulo">
         Média por disciplina
       </h2>
-      <p className="painel-nota">Calculada com as notas lançadas, pela regra de cada disciplina.</p>
+      <p className="painel-nota">
+        Média geral de cada disciplina com as notas lançadas (M1 e M2 com o peso da disciplina). Enquanto
+        faltam notas, o resultado é parcial e provisório.
+      </p>
 
       <ul className="medias">
         {disciplinas.map(({ id, nome, professor, desempenho }) => (
@@ -166,6 +163,14 @@ function MediasPorDisciplina({ disciplinas }) {
                     ? "nenhuma avaliação cadastrada"
                     : `${desempenho.avaliacoes.comNota} de ${plural(desempenho.avaliacoes.total, "avaliação lançada", "avaliações lançadas")}`}
                 </span>
+                {desempenho.media !== null && (
+                  <span className="media-detalhe">
+                    {desempenho.etapas
+                      .map((etapa) => `${etapa.etapa} ${etapa.media === null ? "sem notas" : formatarNumero(etapa.media)}`)
+                      .join(" · ")}
+                    {` · ${estadoDaMedia(desempenho).curto}`}
+                  </span>
+                )}
                 {desempenho.media !== null && <Selo situacao={desempenho.situacao} mapa={SITUACAO_NOTA} />}
               </span>
               <strong className="media-valor">
@@ -180,18 +185,14 @@ function MediasPorDisciplina({ disciplinas }) {
 }
 
 function FrequenciaPorDisciplina({ disciplinas }) {
-  const limites = [...new Set(disciplinas.map((d) => d.frequencia.limiteFaltas))];
-
   return (
     <section className="painel-bloco" aria-labelledby="titulo-frequencia-painel">
       <h2 id="titulo-frequencia-painel" className="painel-titulo">
         Frequência
       </h2>
       <p className="painel-nota">
-        {limites.length === 1
-          ? `Limite de reprovação: ${formatarPercentual(limites[0])} de faltas. `
-          : "Limite de faltas definido em cada disciplina. "}
-        A barra mostra quanto do limite já foi usado.
+        Percentual sobre o total de aulas de cada disciplina. A barra mostra quanto do limite de faltas já foi
+        usado.
       </p>
 
       <ul className="frequencias">
@@ -212,7 +213,7 @@ function FrequenciaPorDisciplina({ disciplinas }) {
               <span>
                 {frequencia.aulasRegistradas === 0
                   ? "Nenhuma aula registrada"
-                  : `${plural(frequencia.faltas, "falta", "faltas")} em ${plural(frequencia.aulasRegistradas, "aula", "aulas")}`}
+                  : textoFaltasEmAulas(frequencia)}
                 {frequencia.faltasRestantes !== null &&
                   frequencia.aulasRegistradas > 0 &&
                   frequencia.faltasRestantes >= 0 &&
@@ -229,7 +230,6 @@ function FrequenciaPorDisciplina({ disciplinas }) {
   );
 }
 
-// Calendário geral: eventos cadastrados no Calendário + dias de aula do horário semanal de cada disciplina.
 function CalendarioGeral({ disciplinas }) {
   const { eventos, carregando, erroEventos } = useEventos();
   const aulas = aulasPorDiaDaSemana(disciplinas);
@@ -271,6 +271,7 @@ function ConteudoDoPainel({ painel }) {
   }
 
   const { eventos, mediaGeral } = resumo;
+  const parciais = painel.disciplinas.filter((d) => d.desempenho.media !== null && !d.desempenho.final).length;
   const semEventos = eventos.total === 0;
 
   return (
@@ -283,7 +284,9 @@ function ConteudoDoPainel({ painel }) {
           detalhe={
             mediaGeral.valor === null
               ? "nenhuma nota lançada"
-              : `média de ${plural(mediaGeral.disciplinasComNota, "disciplina", "disciplinas")} com nota`
+              : `média de ${plural(mediaGeral.disciplinasComNota, "disciplina", "disciplinas")} com nota${
+                  parciais > 0 ? ` · ${plural(parciais, "parcial", "parciais")}` : ""
+                }`
           }
         />
         <Indicador

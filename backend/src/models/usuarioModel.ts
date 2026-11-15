@@ -83,13 +83,16 @@ export function buscarComDadosAcademicos(id: number) {
         select: {
           nome: true,
           professor: true,
-          semestre: true,
+          periodoTipo: true,
+          periodoNumero: true,
           cargaHoraria: true,
           horario: true,
           inicioAulas: true,
           fimAulas: true,
           regraMedia: true,
           mediaAprovacao: true,
+          pesoM1: true,
+          pesoM2: true,
           limiteFaltas: true,
           criadoEm: true,
           eventos: {
@@ -97,6 +100,7 @@ export function buscarComDadosAcademicos(id: number) {
             select: {
               titulo: true,
               tipo: true,
+              etapa: true,
               data: true,
               peso: true,
               status: true,

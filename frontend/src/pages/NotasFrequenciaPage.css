@@ -97,7 +97,8 @@
 }
 
 .texto-critico,
-.texto-atencao {
+.texto-atencao,
+.texto-bom {
   font-size: 13px;
   border-radius: 8px;
   padding: 8px 10px;
@@ -114,7 +115,11 @@
   color: #8a5a08;
 }
 
-/* Notas */
+.texto-bom {
+  background: var(--sucesso-fundo);
+  color: var(--sucesso);
+}
+
 .lista-avaliacoes {
   list-style: none;
   display: flex;
@@ -250,8 +255,6 @@
   color: var(--lilas-escuro);
   font-weight: 600;
 }
-
-/* Frequência */
 
 .registrar-aula,
 .quanto-pode-faltar {
@@ -413,4 +416,92 @@
   .destaque-numero strong {
     font-size: 22px;
   }
+}
+
+.resumo-medias {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 4px 0 12px;
+}
+
+.resumo-media {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  font-family: inherit;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #cfcbd8;
+  background: var(--branco);
+  color: var(--preto);
+}
+
+.resumo-media strong {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.resumo-media-rotulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lilas-escuro);
+}
+
+.resumo-media-detalhe {
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+button.resumo-media {
+  cursor: pointer;
+}
+
+button.resumo-media:hover {
+  border-color: var(--lilas);
+}
+
+button.resumo-media[aria-pressed="true"] {
+  border-color: var(--lilas);
+  background: var(--lilas-claro);
+  box-shadow: inset 0 0 0 1px var(--lilas);
+}
+
+button.resumo-media:focus-visible {
+  outline: 2px solid var(--lilas-escuro);
+  outline-offset: 2px;
+}
+
+.resumo-media-geral {
+  background: #f7f6f9;
+  border-color: var(--borda);
+}
+
+.resumo-media-geral .selo {
+  margin-top: 4px;
+  white-space: normal;
+}
+
+@media (max-width: 560px) {
+  .resumo-medias {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .resumo-media-geral {
+    grid-column: span 2;
+  }
+}
+
+.avaliacao-mover {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--lilas-escuro);
+  text-decoration: underline;
+  cursor: pointer;
 }

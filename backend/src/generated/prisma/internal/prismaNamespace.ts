@@ -854,13 +854,16 @@ export const DisciplinaScalarFieldEnum = {
   id: 'id',
   nome: 'nome',
   professor: 'professor',
-  semestre: 'semestre',
+  periodoTipo: 'periodoTipo',
+  periodoNumero: 'periodoNumero',
   cargaHoraria: 'cargaHoraria',
   horario: 'horario',
   inicioAulas: 'inicioAulas',
   fimAulas: 'fimAulas',
   regraMedia: 'regraMedia',
   mediaAprovacao: 'mediaAprovacao',
+  pesoM1: 'pesoM1',
+  pesoM2: 'pesoM2',
   limiteFaltas: 'limiteFaltas',
   usuarioId: 'usuarioId',
   criadoEm: 'criadoEm'
@@ -873,6 +876,7 @@ export const EventoScalarFieldEnum = {
   id: 'id',
   titulo: 'titulo',
   tipo: 'tipo',
+  etapa: 'etapa',
   data: 'data',
   peso: 'peso',
   status: 'status',
@@ -986,6 +990,20 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'PeriodoTipo'
+ */
+export type EnumPeriodoTipoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PeriodoTipo'>
+    
+
+
+/**
+ * Reference to a field of type 'PeriodoTipo[]'
+ */
+export type ListEnumPeriodoTipoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PeriodoTipo[]'>
+    
+
+
+/**
  * Reference to a field of type 'RegraMedia'
  */
 export type EnumRegraMediaFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RegraMedia'>
@@ -1024,6 +1042,20 @@ export type EnumTipoEventoFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'TipoEvento[]'
  */
 export type ListEnumTipoEventoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoEvento[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EtapaAvaliacao'
+ */
+export type EnumEtapaAvaliacaoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EtapaAvaliacao'>
+    
+
+
+/**
+ * Reference to a field of type 'EtapaAvaliacao[]'
+ */
+export type ListEnumEtapaAvaliacaoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EtapaAvaliacao[]'>
     
 
 

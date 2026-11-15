@@ -17,7 +17,6 @@ async function garantirDisciplina(usuarioId: number, disciplinaId: number) {
   }
 }
 
-// Frequência é registro de aula que já aconteceu: não aceita data futura.
 function garantirDataPassada(data: string) {
   if (data > dataDeHoje()) {
     throw new AppError("Não é possível registrar frequência de uma aula que ainda não aconteceu.", 400);
@@ -83,7 +82,6 @@ export async function remover(usuarioId: number, id: number) {
   return registro;
 }
 
-/** Texto curto para a auditoria: "Cálculo I · 14/10/2026 · 2 aula(s), 1 falta(s)". */
 export function descrever(registro: {
   data: Date;
   quantidadeAulas: number;

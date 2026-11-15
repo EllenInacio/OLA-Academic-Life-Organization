@@ -1,6 +1,6 @@
 import { StatusEvento, TipoEvento } from "../types/evento";
 import { DIAS_PARA_ALERTA, DIAS_URGENTE, diasEntre } from "./prazos";
-import { Desempenho, RegraMedia, calcularDesempenho, ehAvaliativo } from "./notas";
+import { Desempenho, Etapa, RegraMedia, calcularDesempenho, ehAvaliativo } from "./notas";
 import { Frequencia, RegistroParaCalculo, calcularFrequencia } from "./frequencia";
 import { arredondar } from "./numeros";
 
@@ -15,6 +15,7 @@ export type EventoParaCalculo = {
   status: StatusEvento;
   nota: number | null;
   notaMaxima: number;
+  etapa: Etapa;
   disciplina: { id: number; nome: string };
 };
 
@@ -22,14 +23,15 @@ export type DisciplinaParaCalculo = {
   id: number;
   nome: string;
   professor: string | null;
-  semestre: string | null;
   cargaHoraria: number | null;
   horario: string | null;
   inicioAulas?: string | null;
   fimAulas?: string | null;
   regraMedia: RegraMedia;
   mediaAprovacao: number | null;
-  limiteFaltas: number;
+  pesoM1: number;
+  pesoM2: number;
+  limiteFaltas: number | null;
   eventos: EventoParaCalculo[];
   frequencias: RegistroParaCalculo[];
 };
@@ -141,7 +143,12 @@ export function calcularIndicadoresDaDisciplina(disciplina: DisciplinaParaCalcul
   return {
     desempenho: calcularDesempenho(
       disciplina.eventos,
-      { regraMedia: disciplina.regraMedia, mediaAprovacao: disciplina.mediaAprovacao },
+      {
+        regraMedia: disciplina.regraMedia,
+        mediaAprovacao: disciplina.mediaAprovacao,
+        pesoM1: disciplina.pesoM1,
+        pesoM2: disciplina.pesoM2,
+      },
       hoje
     ),
     frequencia: calcularFrequencia(disciplina.frequencias, {
@@ -232,15 +239,8 @@ export function montarPainel(disciplinas: DisciplinaParaCalculo[], hoje: string)
     alertasAcademicos.filter((a) => ALERTAS_ACADEMICOS.includes(a.tipo)).map((a) => a.disciplina.id)
   ).size;
 
-  const semestres = [
-    ...new Set(disciplinas.map((d) => d.semestre).filter((s): s is string => Boolean(s))),
-  ]
-    .sort()
-    .reverse();
-
   return {
     hoje,
-    semestres,
     regras: { diasParaAlerta: DIAS_PARA_ALERTA, diasUrgente: DIAS_URGENTE },
     resumo: {
       disciplinas: disciplinas.length,
@@ -256,7 +256,6 @@ export function montarPainel(disciplinas: DisciplinaParaCalculo[], hoje: string)
       id: disciplina.id,
       nome: disciplina.nome,
       professor: disciplina.professor,
-      semestre: disciplina.semestre,
       cargaHoraria: disciplina.cargaHoraria,
       horario: disciplina.horario,
       inicioAulas: disciplina.inicioAulas ?? null,

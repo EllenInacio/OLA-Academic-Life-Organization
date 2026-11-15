@@ -10,14 +10,17 @@ export type RegistroParaCalculo = {
 
 export type CriteriosDeFrequencia = {
   cargaHoraria: number | null;
-  limiteFaltas: number; 
+  limiteFaltas: number | null;
 };
 
 export type SituacaoFrequencia =
   | "SEM_REGISTROS"
+  | "SEM_LIMITE"
   | "DENTRO_DO_LIMITE"
   | "PERTO_DO_LIMITE"
   | "ACIMA_DO_LIMITE";
+
+  export type BaseDaFrequencia = "TOTAL_DA_DISCIPLINA" | "AULAS_REGISTRADAS";
 
 function situacaoPelaQuantidade(faltas: number, permitidas: number): SituacaoFrequencia {
   if (faltas > permitidas) return "ACIMA_DO_LIMITE";
@@ -25,45 +28,48 @@ function situacaoPelaQuantidade(faltas: number, permitidas: number): SituacaoFre
   return "DENTRO_DO_LIMITE";
 }
 
-function situacaoPeloPercentual(percentual: number, limite: number): SituacaoFrequencia {
-  if (percentual > limite) return "ACIMA_DO_LIMITE";
-  if (percentual > 0 && percentual >= LIMIAR_ATENCAO * limite) return "PERTO_DO_LIMITE";
-  return "DENTRO_DO_LIMITE";
-}
-
 export function calcularFrequencia(registros: RegistroParaCalculo[], criterios: CriteriosDeFrequencia) {
   const aulasRegistradas = registros.reduce((soma, r) => soma + r.quantidadeAulas, 0);
   const faltas = registros.reduce((soma, r) => soma + r.faltas, 0);
-
-  const percentualFaltas =
-    aulasRegistradas > 0 ? arredondar((faltas / aulasRegistradas) * 100) : null;
+  const temRegistros = registros.length > 0;
 
   const aulasPrevistas = criterios.cargaHoraria ? criterios.cargaHoraria * AULAS_POR_HORA : null;
-  const faltasPermitidas =
-    aulasPrevistas !== null ? Math.floor((aulasPrevistas * criterios.limiteFaltas) / 100) : null;
+  const base: BaseDaFrequencia = aulasPrevistas !== null ? "TOTAL_DA_DISCIPLINA" : "AULAS_REGISTRADAS";
+  const totalAulas = aulasPrevistas ?? aulasRegistradas;
+
+  const faltasAcimaDoTotal = temRegistros && faltas > totalAulas;
+  const percentualFaltas =
+    temRegistros && totalAulas > 0 ? arredondar(Math.min(100, (faltas / totalAulas) * 100)) : null;
+
+  const faltasPermitidas = criterios.limiteFaltas;
 
   let situacao: SituacaoFrequencia = "SEM_REGISTROS";
-  if (aulasRegistradas > 0) {
-    situacao =
-      faltasPermitidas !== null
-        ? situacaoPelaQuantidade(faltas, faltasPermitidas)
-        : situacaoPeloPercentual(percentualFaltas!, criterios.limiteFaltas);
+  if (temRegistros) {
+    situacao = faltasPermitidas === null ? "SEM_LIMITE" : situacaoPelaQuantidade(faltas, faltasPermitidas);
   }
+
+  const ritmoAcimaDoLimite =
+    aulasRegistradas > 0 &&
+    faltas <= aulasRegistradas &&
+    aulasPrevistas !== null &&
+    faltasPermitidas !== null &&
+    (faltas / aulasRegistradas) * aulasPrevistas > faltasPermitidas;
 
   return {
     limiteFaltas: criterios.limiteFaltas,
+    base,
+    totalAulas: temRegistros || aulasPrevistas !== null ? totalAulas : null,
     aulasRegistradas,
     faltas,
-    presencas: aulasRegistradas - faltas,
+    presencas: Math.max(0, aulasRegistradas - faltas),
     percentualFaltas,
-    percentualPresenca: percentualFaltas === null ? null 
-      : arredondar(100 - percentualFaltas),
+    percentualPresenca: percentualFaltas === null ? null : arredondar(100 - percentualFaltas),
+    faltasAcimaDoTotal,
     aulasPrevistas,
     faltasPermitidas,
     faltasRestantes: faltasPermitidas === null ? null : faltasPermitidas - faltas,
     situacao,
-    base: faltasPermitidas === null ? "AULAS_REGISTRADAS" : "CARGA_HORARIA",
-    ritmoAcimaDoLimite: percentualFaltas !== null && percentualFaltas > criterios.limiteFaltas,
+    ritmoAcimaDoLimite,
     registrosAcimaDoPrevisto: aulasPrevistas !== null && aulasRegistradas > aulasPrevistas,
   };
 }

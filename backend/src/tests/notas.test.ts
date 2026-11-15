@@ -145,7 +145,7 @@ describe("Notas", () => {
       regraMedia: "PONDERADA",
       media: 6.88,
       situacao: "PARCIAL_ACIMA",
-      notaNecessaria: { valor: 4.83, alcancavel: true },
+      notaNecessaria: { valor: 5.79, alcancavel: true },
       avaliacoes: { total: 3, comNota: 2, semNota: 1 },
     });
 
@@ -156,7 +156,28 @@ describe("Notas", () => {
 
     const aritmetica = await request(app).get(`/api/disciplinas/${disciplinaId}`).set(autorizacao);
     expect(aritmetica.body.resumo.desempenho).toMatchObject({ regraMedia: "ARITMETICA", media: 7.25 });
-    expect(aritmetica.body.mediaAprovacao).toBe("6"); // mantida, pois não foi enviada na edição
+    expect(aritmetica.body.mediaAprovacao).toBe("6");
+  });
+
+  it("calcula a média de cada etapa e a média final com os pesos da disciplina", async () => {
+    const disciplinaId = await criarDisciplina({ mediaAprovacao: 6, pesoM1: 4, pesoM2: 6 });
+    const p1 = await criarAvaliacao(disciplinaId, { titulo: "Prova M1", etapa: "M1" });
+    const p2 = await criarAvaliacao(disciplinaId, { titulo: "Prova M2", etapa: "M2" });
+
+    await lancarNota(p1.body.id, { nota: 7 });
+    await lancarNota(p2.body.id, { nota: 9 });
+
+    const resposta = await request(app).get(`/api/disciplinas/${disciplinaId}`).set(autorizacao);
+
+    expect(resposta.body.resumo.desempenho).toMatchObject({
+      media: 8.2,
+      final: true,
+      situacao: "ATINGIU_MEDIA",
+      etapas: [
+        { etapa: "M1", peso: 4, media: 7, completa: true },
+        { etapa: "M2", peso: 6, media: 9, completa: true },
+      ],
+    });
   });
 
   it("isola as notas entre usuários", async () => {
@@ -198,8 +219,11 @@ describe("Notas", () => {
     expect(resposta.body.disciplinas[0].criteriosDeAvaliacao).toEqual({
       regraMedia: "PONDERADA",
       mediaAprovacao: 6,
+      pesoM1: 1,
+      pesoM2: 2,
       limiteFaltas: 20,
     });
-    expect(resposta.body.disciplinas[0].eventos[0]).toMatchObject({ nota: 9, notaMaxima: 10 });
+    expect(resposta.body.disciplinas[0]).not.toHaveProperty("semestre");
+    expect(resposta.body.disciplinas[0].eventos[0]).toMatchObject({ nota: 9, notaMaxima: 10, etapa: "M1" });
   });
 });

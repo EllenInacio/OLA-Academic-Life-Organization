@@ -11,18 +11,28 @@ function dataDoPeriodo(valor?: string | null) {
   return valor ? new Date(valor) : null;
 }
 
+function periodoAcademico(dados: DadosDisciplina) {
+  if (dados.periodoTipo === undefined) return {};
+  return {
+    periodoTipo: dados.periodoTipo,
+    periodoNumero: dados.periodoTipo === "SEMESTRE" ? (dados.periodoNumero ?? null) : null,
+  };
+}
+
 function camposDisciplina(dados: DadosDisciplina) {
   return {
     nome: dados.nome,
     professor: dados.professor || null,
-    semestre: dados.semestre || null,
+    ...periodoAcademico(dados),
     cargaHoraria: dados.cargaHoraria ?? null,
     horario: dados.horario || null,
     inicioAulas: dataDoPeriodo(dados.inicioAulas),
     fimAulas: dataDoPeriodo(dados.fimAulas),
     regraMedia: dados.regraMedia ?? undefined,
     mediaAprovacao: dados.mediaAprovacao === undefined ? undefined : dados.mediaAprovacao,
-    limiteFaltas: dados.limiteFaltas ?? undefined,
+    pesoM1: dados.pesoM1 ?? undefined,
+    pesoM2: dados.pesoM2 ?? undefined,
+    limiteFaltas: dados.limiteFaltas === undefined ? undefined : dados.limiteFaltas,
   };
 }
 

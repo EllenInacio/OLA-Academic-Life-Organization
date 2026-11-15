@@ -1,6 +1,7 @@
 import { AppError } from "../errors/AppError";
 import * as disciplinaModel from "../models/disciplinaModel";
-import { DadosDisciplina } from "../types/disciplina";
+import { CARGA_HORARIA_MAXIMA, DadosDisciplina } from "../types/disciplina";
+import { calcularCargaHoraria } from "../calculos/cargaHoraria";
 import { dataDeHoje, diasEntre, paraDataISO } from "../calculos/prazos";
 import { resumirDisciplina } from "./dashboardService";
 import { plural } from "../utils/formatacao";
@@ -8,8 +9,33 @@ import { plural } from "../utils/formatacao";
 const NOME_REPETIDO = "Já existe uma disciplina com esse nome.";
 const NAO_ENCONTRADA = "Disciplina não encontrada.";
 
+type PeriodoSalvo = { inicioAulas: Date | null; fimAulas: Date | null };
+
 function ehNomeRepetido(erro: unknown) {
   return (erro as { code?: string } | null)?.code === "P2002";
+}
+
+function dataDasAulas(informada: string | null | undefined, salva?: Date | null) {
+  if (informada === undefined) return salva ? paraDataISO(salva) : null;
+  return informada || null;
+}
+
+function comCargaHorariaCalculada(dados: DadosDisciplina, salvo?: PeriodoSalvo): DadosDisciplina {
+  const calculo = calcularCargaHoraria({
+    horario: dados.horario,
+    inicioAulas: dataDasAulas(dados.inicioAulas, salvo?.inicioAulas),
+    fimAulas: dataDasAulas(dados.fimAulas, salvo?.fimAulas),
+  });
+
+  if (calculo && calculo.horas > CARGA_HORARIA_MAXIMA) {
+    throw new AppError(
+      `A carga horária calculada (${calculo.horas}h) passa do limite de ${CARGA_HORARIA_MAXIMA}h. ` +
+        "Confira os horários e as datas de início e fim das aulas.",
+      400
+    );
+  }
+
+  return { ...dados, cargaHoraria: calculo?.horas ?? null };
 }
 
 export async function listar(usuarioId: number) {
@@ -60,9 +86,10 @@ async function garantirNomeDisponivel(usuarioId: number, nome: string, idAtual?:
 
 export async function criar(usuarioId: number, dados: DadosDisciplina) {
   await garantirNomeDisponivel(usuarioId, dados.nome);
+  const completos = comCargaHorariaCalculada(dados);
 
   try {
-    return await disciplinaModel.criar(usuarioId, dados);
+    return await disciplinaModel.criar(usuarioId, completos);
   } catch (erro) {
     if (ehNomeRepetido(erro)) throw new AppError(NOME_REPETIDO, 409);
     throw erro;
@@ -77,9 +104,10 @@ export async function atualizar(usuarioId: number, id: number, dados: DadosDisci
   }
 
   await garantirNomeDisponivel(usuarioId, dados.nome, id);
+  const completos = comCargaHorariaCalculada(dados, disciplina);
 
   try {
-    return await disciplinaModel.atualizar(id, dados);
+    return await disciplinaModel.atualizar(id, completos);
   } catch (erro) {
     if (ehNomeRepetido(erro)) throw new AppError(NOME_REPETIDO, 409);
     throw erro;

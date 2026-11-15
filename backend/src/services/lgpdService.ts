@@ -75,7 +75,10 @@ export async function exportar(usuarioId: number, ip?: string) {
     disciplinas: titular.disciplinas.map((disciplina) => ({
       nome: disciplina.nome,
       professor: disciplina.professor,
-      semestre: disciplina.semestre,
+      periodoAcademico:
+        disciplina.periodoTipo === null
+          ? null
+          : { tipo: disciplina.periodoTipo, semestre: disciplina.periodoNumero },
       cargaHoraria: disciplina.cargaHoraria,
       horario: disciplina.horario,
       inicioAulas: disciplina.inicioAulas?.toISOString().slice(0, 10) ?? null,
@@ -83,12 +86,15 @@ export async function exportar(usuarioId: number, ip?: string) {
       criteriosDeAvaliacao: {
         regraMedia: disciplina.regraMedia,
         mediaAprovacao: disciplina.mediaAprovacao === null ? null : Number(disciplina.mediaAprovacao),
-        limiteFaltas: Number(disciplina.limiteFaltas),
+        pesoM1: Number(disciplina.pesoM1),
+        pesoM2: Number(disciplina.pesoM2),
+        limiteFaltas: disciplina.limiteFaltas,
       },
       criadaEm: disciplina.criadoEm,
       eventos: disciplina.eventos.map((evento) => ({
         titulo: evento.titulo,
         tipo: evento.tipo,
+        etapa: evento.etapa,
         data: evento.data.toISOString().slice(0, 10),
         peso: Number(evento.peso),
         status: evento.status,

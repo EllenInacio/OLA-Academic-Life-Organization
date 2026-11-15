@@ -269,8 +269,6 @@ body {
   padding: 20px 0;
 }
 
-/* ---- Componentes compartilhados da área logada (Dashboard e Disciplinas) ---- */
-
 a.botao-principal,
 a.botao-secundario {
   display: inline-block;
@@ -335,7 +333,6 @@ a.botao-secundario {
   margin-top: 16px;
 }
 
-/* Cartão compacto de evento (cor da borda = tipo, como no calendário) */
 .evento-resumo {
   background: var(--branco);
   border: 1px solid var(--borda);
@@ -395,7 +392,6 @@ a.botao-secundario {
   overflow-wrap: anywhere;
 }
 
-/* Selos de situação (sempre com texto) */
 .selo {
   display: inline-block;
   font-size: 12px;
@@ -425,7 +421,6 @@ a.botao-secundario {
   color: var(--erro);
 }
 
-/* Barra de uso do limite de faltas (Dashboard e Notas e frequência) */
 .barra-frequencia {
   height: 10px;
   border-radius: 4px;
